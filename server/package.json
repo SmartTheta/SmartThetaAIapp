@@ -1,0 +1,33 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "SmartTheta Index Server",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon src/server.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "kiteconnect": "^5.1.0",
+    "mongoose": "^8.2.0",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.19",
+    "@types/node-cron": "^3.0.11",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
