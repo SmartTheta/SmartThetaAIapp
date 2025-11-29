@@ -18,11 +18,6 @@ export class KiteService {
                 api_key: this.apiKey
             });
         }
-
-        // Initialize access token if available in env
-        if (process.env.KITE_ACCESS_TOKEN) {
-            this.setAccessToken(process.env.KITE_ACCESS_TOKEN);
-        }
     }
 
     /**
