@@ -13,24 +13,19 @@ const PORT = process.env.PORT || 5000;
  * Start the server
  */
 async function startServer() {
-    try {
-        // Connect to MongoDB
-        await connectDB();
+    // Connect to MongoDB (failure won't stop the server now)
+    await connectDB();
 
-        // Initialize cron jobs
-        initializeCronJobs();
+    // Initialize cron jobs
+    initializeCronJobs();
 
-        // Start Express server
-        app.listen(PORT, () => {
-            console.log('🚀 Server started successfully');
-            console.log(`📡 Server running on http://localhost:${PORT}`);
-            console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-            console.log(`📊 API Base URL: http://localhost:${PORT}/api/index`);
-        });
-    } catch (error) {
-        console.error('❌ Failed to start server:', error);
-        process.exit(1);
-    }
+    // Start Express server
+    app.listen(PORT, () => {
+        console.log('🚀 Server started successfully');
+        console.log(`📡 Server running on http://localhost:${PORT}`);
+        console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+        console.log(`📊 API Base URL: http://localhost:${PORT}/api/index`);
+    });
 }
 
 // Handle graceful shutdown

@@ -10,7 +10,7 @@ export const connectDB = async (): Promise<void> => {
         console.log(`📊 Database: ${mongoose.connection.name}`);
     } catch (error) {
         console.error('❌ MongoDB connection error:', error);
-        process.exit(1);
+        console.warn('⚠️  Server will continue running in degraded mode without database access.');
     }
 };
 

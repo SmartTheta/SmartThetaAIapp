@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { kiteService } from '../services/kiteService';
+import { yahooFinanceService } from '../services/yahooFinanceService';
 
 export const getTopGainers = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -106,46 +107,11 @@ export const searchStock = async (req: Request, res: Response): Promise<void> =>
 
 export const getGlobalIndices = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Only fetch Indian indices from Kite
-        try {
-            const indianIndices = ['NSE:NIFTY 50', 'BSE:SENSEX'];
-            const kiteData = await kiteService.getQuotes(indianIndices);
-            const data: any[] = [];
-
-            if (kiteData && Object.keys(kiteData).length > 0) {
-                // Update NIFTY 50
-                const niftyData = kiteData['NSE:NIFTY 50'];
-                if (niftyData) {
-                    data.push({
-                        symbol: '^NSEI',
-                        name: 'NIFTY 50',
-                        price: niftyData.last_price,
-                        change: niftyData.last_price - niftyData.ohlc.close,
-                        changePercent: ((niftyData.last_price - niftyData.ohlc.close) / niftyData.ohlc.close) * 100
-                    });
-                }
-
-                // Update SENSEX
-                const sensexData = kiteData['BSE:SENSEX'];
-                if (sensexData) {
-                    data.push({
-                        symbol: '^BSESN',
-                        name: 'SENSEX',
-                        price: sensexData.last_price,
-                        change: sensexData.last_price - sensexData.ohlc.close,
-                        changePercent: ((sensexData.last_price - sensexData.ohlc.close) / sensexData.ohlc.close) * 100
-                    });
-                }
-            }
-
-            res.json({
-                count: data.length,
-                data
-            });
-        } catch (error) {
-            console.warn('Failed to fetch Indian indices from Kite:', error);
-            res.json({ count: 0, data: [] });
-        }
+        const data = await yahooFinanceService.getWorldIndices();
+        res.json({
+            count: data.length,
+            data
+        });
     } catch (error) {
         console.error('Error in getGlobalIndices:', error);
         res.status(500).json({

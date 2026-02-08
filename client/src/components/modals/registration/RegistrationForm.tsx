@@ -233,7 +233,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             <button
                 onClick={() => {
                     if (isFormValid) {
-                        window.location.href = '/dashboard';
+                        window.location.href = '/dashboard/risk-assessment';
                     }
                 }}
                 disabled={!isFormValid}

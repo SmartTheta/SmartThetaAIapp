@@ -5,17 +5,19 @@ import { Footer } from './Footer';
 
 interface LayoutProps {
     children: ReactNode;
+    onSignUpClick?: () => void;
+    onLoginClick?: () => void;
 }
 
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = ({ children, onSignUpClick, onLoginClick }: LayoutProps) => {
     return (
         <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
             <TopHeader />
-            <Navbar />
+            <Navbar onSignUpClick={onSignUpClick} onLoginClick={onLoginClick} />
             <main className="flex-grow">
                 {children}
             </main>
-            <Footer />
+            <Footer onLoginClick={onLoginClick} />
         </div>
     );
 };

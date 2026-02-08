@@ -39,7 +39,11 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
     };
 
     const handleNext = () => {
-        if (step === 3) {
+        if (step === 1) {
+            // Simplified for now: Close modal and move to assessment page
+            onClose();
+            window.location.href = '/dashboard/risk-assessment';
+        } else if (step === 3) {
             const allQs = riskSections.flatMap(s => s.questions);
             if (riskStep < allQs.length - 1) {
                 setRiskStep(s => s + 1);

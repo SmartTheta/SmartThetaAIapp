@@ -44,6 +44,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSignU
         await new Promise(r => setTimeout(r, 1500));
         setIsLoading(false);
         onClose();
+        window.location.href = '/dashboard/risk-assessment';
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

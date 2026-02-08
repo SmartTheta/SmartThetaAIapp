@@ -30,8 +30,8 @@ export const SmartThetaIndex = () => {
             setHistoricalData(dailyData.data);
             setLastUpdate(new Date());
         } catch (err) {
-            console.error('Error fetching data:', err);
-            setError('Failed to fetch data. Please check if the server is running.');
+            console.error('Data fetch error:', err);
+            setError('Unavailable');
         } finally {
             setLoading(false);
         }
@@ -58,41 +58,22 @@ export const SmartThetaIndex = () => {
     const percentage = comparison?.percentageChange || 0;
     const isPositive = difference >= 0;
 
-    if (loading) {
+    if (error || loading) {
         return (
-            <section id="index" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-                    <div className="flex items-center justify-center">
-                        <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-                        <span className="ml-3 text-slate-600">Loading SmartTheta Index...</span>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    if (error) {
-        return (
-            <section id="index" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-                    <div className="text-center">
-                        <p className="text-red-600 font-medium">{error}</p>
-                        <button
-                            onClick={fetchData}
-                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </section>
+            <div className="flex flex-col items-center justify-center p-8 min-h-[300px] bg-slate-50/50 rounded-[1.5rem] border border-dashed border-slate-200">
+                <RefreshCw className="w-8 h-8 animate-spin text-blue-400 opacity-50" />
+                <span className="mt-4 text-sm font-medium text-slate-400 uppercase tracking-widest">
+                    Updating Live Index...
+                </span>
+                <p className="text-xs text-slate-300 mt-2">Connecting to secure data feed</p>
+            </div>
         );
     }
 
     return (
-        <section id="index" className="w-full h-full flex flex-col">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
-                <div className="p-6 md:p-8 border-b border-slate-100">
+        <div className="w-full h-full flex flex-col">
+            <div className="h-full flex flex-col">
+                <div className="pb-4 border-b border-gray-100">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h2 className="text-lg font-semibold text-slate-500 uppercase tracking-wider">SmartTheta Index</h2>
@@ -123,7 +104,7 @@ export const SmartThetaIndex = () => {
 
                     {/* Yesterday's value display */}
                     {comparison?.yesterday && (
-                        <div className="mt-4 pt-4 border-t border-slate-100">
+                        <div className="mt-4 pt-4 border-t border-gray-100">
                             <div className="flex items-center gap-4">
                                 <span className="text-sm text-slate-500">Yesterday's Close:</span>
                                 <span className="text-lg font-semibold text-slate-700">
@@ -134,7 +115,7 @@ export const SmartThetaIndex = () => {
                     )}
                 </div>
 
-                <div className="h-[400px] w-full p-4">
+                <div className="h-[250px] w-full py-4">
                     {chartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -177,6 +158,6 @@ export const SmartThetaIndex = () => {
                     )}
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
