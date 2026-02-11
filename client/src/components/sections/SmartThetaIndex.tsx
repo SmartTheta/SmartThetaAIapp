@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { getComparisonData, getHistoricalDaily } from '../../services/api';
@@ -42,8 +42,15 @@ export const SmartThetaIndex = () => {
         fetchData();
     }, []);
 
+    // Calculate values
+    const todayValue = comparison?.today?.profitLoss || 0;
+    const yesterdayValue = comparison?.yesterday?.profitLoss || 0;
+    const difference = comparison?.difference || 0;
+    const percentage = comparison?.percentageChange || 0;
+    const isPositive = difference >= 0;
+
     // Prepare chart data - show last 30 days
-    const chartData: ChartDataPoint[] = historicalData.map((point) => ({
+    let chartData: ChartDataPoint[] = historicalData.map((point) => ({
         date: new Date(point.date).toLocaleDateString('en-IN', {
             day: '2-digit',
             month: 'short'
@@ -51,12 +58,19 @@ export const SmartThetaIndex = () => {
         value: point.profitLoss
     }));
 
-    // Calculate values
-    const todayValue = comparison?.today?.profitLoss || 0;
-    const yesterdayValue = comparison?.yesterday?.profitLoss || 0;
-    const difference = comparison?.difference || 0;
-    const percentage = comparison?.percentageChange || 0;
-    const isPositive = difference >= 0;
+    // If only one data point (Day 1), prepend a starting point (Day 0) to show a trend line
+    if (chartData.length === 1) {
+        chartData = [
+            { date: "Start", value: 0 },
+            ...chartData
+        ];
+    } else if (chartData.length === 0 && !loading) {
+        // Just for safety if no data yet
+        chartData = [
+            { date: "Start", value: 0 },
+            { date: "Current", value: todayValue }
+        ];
+    }
 
     if (error || loading) {
         return (
@@ -71,7 +85,7 @@ export const SmartThetaIndex = () => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col p-6 lg:p-8">
             <div className="h-full flex flex-col">
                 <div className="pb-4 border-b border-gray-100">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -115,41 +129,49 @@ export const SmartThetaIndex = () => {
                     )}
                 </div>
 
-                <div className="h-[250px] w-full py-4">
+                <div className="h-[250px] w-full mt-8 py-2">
                     {chartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor={isPositive ? "#22c55e" : "#ef4444"} stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor={isPositive ? "#22c55e" : "#ef4444"} stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis
                                     dataKey="date"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                    tick={{ fill: '#94a3b8', fontSize: 10 }}
                                     dy={10}
                                 />
                                 <YAxis
                                     domain={['auto', 'auto']}
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                    tick={{ fill: '#94a3b8', fontSize: 10, opacity: 0.8 }}
                                     tickFormatter={(value) => `₹${value.toLocaleString()}`}
+                                    width={60}
                                 />
                                 <Tooltip
                                     contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                     itemStyle={{ color: '#1e293b', fontWeight: 600 }}
                                     formatter={(value: number) => [`₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, 'Value']}
                                 />
-                                <Legend />
-                                <Line
+                                <Area
                                     type="monotone"
                                     dataKey="value"
                                     name="SmartTheta Index"
                                     stroke={isPositive ? "#22c55e" : "#ef4444"}
                                     strokeWidth={3}
-                                    dot={{ fill: isPositive ? "#22c55e" : "#ef4444", r: 4 }}
-                                    activeDot={{ r: 6 }}
+                                    fillOpacity={1}
+                                    fill="url(#colorValue)"
+                                    dot={{ fill: isPositive ? "#22c55e" : "#ef4444", r: 4, strokeWidth: 2, stroke: '#fff' }}
+                                    activeDot={{ r: 6, strokeWidth: 0 }}
                                 />
-                            </LineChart>
+                            </AreaChart>
                         </ResponsiveContainer>
                     ) : (
                         <div className="flex items-center justify-center h-full">

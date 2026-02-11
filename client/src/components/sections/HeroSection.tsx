@@ -1,47 +1,71 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { SmartThetaIndex } from './SmartThetaIndex';
 
 export const HeroSection = () => {
+    const [index, setIndex] = useState(0);
+    const texts = [
+        <>What’s stopping your <span className="text-blue-600">money</span><br />from performing <br />better?</>,
+        <>What if your <br /><span className="text-blue-600">portfolio worked</span> for you <br />— even while relax?</>,
+        <>Ever wondered what it’s like<br />having your own <br /><span className="text-blue-600">fund manager</span>?</>
+    ];
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setIndex((prev) => (prev + 1) % texts.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [texts.length]);
+
     return (
         <section className="relative bg-[#ffffff] overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            <div className="max-w-[1440px] mx-auto px-12 pt-6 lg:pt-10 pb-8 lg:pb-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left Column: Content */}
-                    <div className="flex flex-col justify-center items-start h-full py-2">
-                        <div className="mb-4">
-                            <h1 className="text-4xl lg:text-5xl font-extrabold text-[#1a1a1a] leading-[1.1] tracking-tight">
-                                Grow Your Wealth with <br />
-                                <span className="text-blue-600">Smart Theta AI</span>
-                            </h1>
-                            <p className="mt-4 text-lg text-slate-600 max-w-lg leading-relaxed">
-                                Experience the precision of algorithmic investing. Transparent, secure, and built to scale your portfolio from ₹0.
-                            </p>
+                    <div className="flex flex-col justify-center items-start h-full py-0">
+                        <div className="mb-2 min-h-[120px] lg:min-h-[180px] flex items-center">
+                            <AnimatePresence mode="wait">
+                                <motion.h1
+                                    key={index}
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -15 }}
+                                    transition={{ duration: 0.4, ease: "easeOut" }}
+                                    className="text-4xl lg:text-5xl font-extrabold text-[#1a1a1a] leading-[1.1] tracking-tight"
+                                >
+                                    {texts[index]}
+                                </motion.h1>
+                            </AnimatePresence>
                         </div>
+                        <p className="mt-4 text-lg text-slate-600 max-w-lg leading-relaxed">
+                            Transparent, secure, and built to grow your portfolio - starting from ₹0.
+                        </p>
 
                         {/* Features List */}
-                        <div className="space-y-3 mb-8">
+                        <div className="space-y-3 mt-6 mb-3">
                             {[
                                 'AI-driven portfolio optimization',
                                 'Automated risk management',
                                 'SEBI-compliant broker integration'
                             ].map((feature, idx) => (
                                 <div key={idx} className="flex items-center gap-3 text-slate-700 text-sm font-medium">
-                                    <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
                                     <span>{feature}</span>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="flex flex-col gap-6 w-full sm:w-auto">
+                        <div className="flex flex-col gap-4 w-full sm:w-auto">
                             <button className="group relative px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-xl shadow-xl hover:bg-blue-700 hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3">
                                 Start Free Trial
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </button>
 
                             {/* Trust Indicators */}
-                            <div className="pt-6 border-t border-slate-100 mt-2">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3">
+                            <div className="pt-3 border-t border-slate-100 mt-1">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2">
                                     Trusted by Investors
                                 </p>
                                 <div className="flex flex-wrap gap-x-6 gap-y-3">
@@ -68,10 +92,9 @@ export const HeroSection = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Chart Card */}
                     <div className="lg:block relative">
                         <div className="bg-white rounded-[2rem] shadow-[0_24px_48px_-12px_rgba(37,99,235,0.12)] border border-slate-100 p-2 transform hover:scale-[1.01] transition-transform duration-500 max-w-lg mx-auto lg:ml-auto lg:mr-0">
-                            <div className="overflow-hidden rounded-[1.5rem] scale-[0.95] origin-top">
+                            <div className="rounded-[1.5rem] origin-center">
                                 <SmartThetaIndex />
                             </div>
                         </div>

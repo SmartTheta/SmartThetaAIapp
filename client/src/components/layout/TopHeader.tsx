@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { getGlobalIndices, type StockData } from '../../services/api';
 import { motion } from 'framer-motion';
 
 export const TopHeader = () => {
     const [isMarketOpen, setIsMarketOpen] = useState(false);
-    const [currentTime, setCurrentTime] = useState('');
     const [indices, setIndices] = useState<StockData[]>([]);
+    const [currentTime, setCurrentTime] = useState<string>('');
 
     useEffect(() => {
         const checkMarketStatus = () => {
@@ -22,12 +22,6 @@ export const TopHeader = () => {
             const isBeforeClose = hour < 15 || (hour === 15 && minute <= 30);
 
             setIsMarketOpen(isWeekday && isAfterOpen && isBeforeClose);
-
-            setCurrentTime(istTime.toLocaleTimeString('en-IN', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            }));
         };
 
         const fetchIndices = async () => {
@@ -41,30 +35,40 @@ export const TopHeader = () => {
             }
         };
 
+        const updateTime = () => {
+            const now = new Date();
+            const istTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+            setCurrentTime(istTime.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }));
+        };
+
         checkMarketStatus();
         fetchIndices();
+        updateTime();
         const interval = setInterval(() => {
             checkMarketStatus();
             fetchIndices();
+            updateTime();
         }, 60000);
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <div className="sticky top-0 z-50 bg-slate-950 text-white py-1.5 shadow-md border-b border-slate-800">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-50 bg-slate-950 text-white py-1.5 shadow-md border-b border-slate-800">
+            <div className="max-w-[1440px] mx-auto px-12">
                 <div className="flex justify-between items-center h-7 text-[11px] sm:text-xs font-medium">
 
-                    {/* Left: Market Status Symbol */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className={cn("w-2 h-2 rounded-full animate-pulse", isMarketOpen ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]")} />
-                        <span className={cn("hidden lg:inline uppercase tracking-widest opacity-80", isMarketOpen ? "text-green-400" : "text-red-400")}>
-                            {isMarketOpen ? "Market Open" : "Market Closed"}
-                        </span>
+                    {/* Left Anchor: Current Time (IST) */}
+                    <div className="flex items-center gap-1.5 flex-shrink-0 border-r border-slate-800 pr-4">
+                        <Clock className="w-3 h-3 text-slate-400" />
+                        <span className="text-slate-300 tabular-nums uppercase tracking-tight">{currentTime} IST</span>
                     </div>
 
-                    {/* Center: World Indices Scrolling Ticker */}
-                    <div className="flex-grow overflow-hidden px-4 sm:px-8 group">
+                    {/* Center: World Indices Scrolling Ticker (Maximized Width) */}
+                    <div className="flex-grow overflow-hidden group">
                         <div className="flex overflow-hidden relative w-full h-full items-center">
                             {indices.length > 0 ? (
                                 <motion.div
@@ -79,7 +83,7 @@ export const TopHeader = () => {
                                         },
                                     }}
                                 >
-                                    {indices.map((index, i) => (
+                                    {indices.map((index: StockData, i: number) => (
                                         <div key={`${index.symbol}-${i}`} className="flex items-center gap-2.5">
                                             <span className="text-slate-400 uppercase tracking-tight">{index.name}</span>
                                             <span className="font-bold tabular-nums">
@@ -102,10 +106,12 @@ export const TopHeader = () => {
                         </div>
                     </div>
 
-                    {/* Right: Time */}
-                    <div className="flex items-center gap-1.5 text-slate-300 flex-shrink-0">
-                        <Clock className="w-3 h-3 opacity-60" />
-                        <span className="tabular-nums opacity-90">{currentTime}</span>
+                    {/* Right Anchor: Market Status Symbol */}
+                    <div className="flex items-center gap-2 flex-shrink-0 pl-4 border-l border-slate-800">
+                        <div className={cn("w-2 h-2 rounded-full animate-pulse", isMarketOpen ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]")} />
+                        <span className={cn("uppercase tracking-widest opacity-80", isMarketOpen ? "text-green-400" : "text-red-400")}>
+                            {isMarketOpen ? "Market Open" : "Market Closed"}
+                        </span>
                     </div>
                 </div>
             </div>

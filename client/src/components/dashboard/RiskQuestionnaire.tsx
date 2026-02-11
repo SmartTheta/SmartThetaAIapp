@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, ChevronRight, TrendingUp, Shield, CheckCircle, Award, HelpCircle, Clock, Wallet, ShieldCheck, User, BarChart3, AlertCircle } from 'lucide-react';
+import { Bot, ChevronRight, TrendingUp, Shield, CheckCircle, Award, Clock, Wallet, ShieldCheck, User, BarChart3, AlertCircle, RefreshCw, Download } from 'lucide-react';
 
 export interface RiskQuestionnaireProps {
     onComplete: (result: RiskAssessmentResult) => void;
@@ -24,6 +24,7 @@ export interface RiskAssessmentResult {
 const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => {
     const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const [results, setResults] = useState<RiskAssessmentResult | null>(null);
 
@@ -359,7 +360,17 @@ const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => 
     };
 
     const handleAnswer = (questionId: string, value: string) => {
+        if (isTransitioning) return;
         setAnswers(prev => ({ ...prev, [questionId]: value }));
+
+        // Auto-advance logic: move to next question after a small delay
+        if (currentQuestionIdx < questions.length - 1) {
+            setIsTransitioning(true);
+            setTimeout(() => {
+                handleNext();
+                setIsTransitioning(false);
+            }, 400);
+        }
     };
 
     const handleNext = () => {
@@ -388,6 +399,16 @@ const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => 
     if (showResults && results) {
         return (
             <div className="max-w-4xl mx-auto py-12 px-6">
+                <style>
+                    {`
+                    @media print {
+                        .no-print { display: none !important; }
+                        .max-w-4xl { max-width: 100% !important; margin: 0 !important; }
+                        button { display: none !important; }
+                        body { background: white !important; }
+                    }
+                    `}
+                </style>
                 <div className="bg-white rounded-3xl p-12 shadow-xl border border-slate-100 text-center">
                     <h2 className="text-xl font-bold text-slate-500 mb-2 uppercase tracking-widest">Your Strategy</h2>
                     <h1 className="text-4xl lg:text-6xl font-black text-blue-600 mb-6">{results.tierName}</h1>
@@ -417,11 +438,30 @@ const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => 
                         </div>
                     </div>
 
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12 no-print">
+                        <button
+                            onClick={() => window.print()}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+                        >
+                            <Download size={18} /> Download Report
+                        </button>
+                        <button
+                            onClick={() => {
+                                setShowResults(false);
+                                setCurrentQuestionIdx(0);
+                                setAnswers({});
+                            }}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-xl font-bold hover:bg-blue-100 transition-all shadow-sm"
+                        >
+                            <RefreshCw size={18} /> Retake Assessment
+                        </button>
+                    </div>
+
                     <button
                         onClick={handleContinue}
-                        className="bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-xl hover:shadow-blue-200 flex items-center gap-4 mx-auto"
+                        className="bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-xl hover:shadow-blue-200 flex items-center gap-4 mx-auto no-print"
                     >
-                        Continue to Portfolio Builder <ChevronRight size={28} />
+                        Continue to Investment Setup<ChevronRight size={28} />
                     </button>
                 </div>
             </div>
@@ -443,7 +483,7 @@ const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => 
                     </div>
 
                     <div className="grid grid-cols-3 gap-2">
-                        {sections.map((section, idx) => {
+                        {sections.map((_, idx) => {
                             const shortName = ['Capacity', 'Tolerance', 'Behavioral'][idx];
                             return (
                                 <div key={idx} className={`px-3 py-1.5 rounded-lg border transition-all ${currentQuestion.section === idx ? 'border-blue-200 bg-blue-50/50 shadow-sm' : 'border-slate-100 bg-white'}`}>
@@ -476,10 +516,11 @@ const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => 
                             <button
                                 key={option.value}
                                 onClick={() => handleAnswer(currentQuestion.id, option.value)}
+                                disabled={isTransitioning}
                                 className={`w-full text-left p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 group relative ${isSelected
                                     ? 'border-blue-400 bg-blue-50/40'
                                     : 'border-slate-100 hover:border-blue-200 hover:bg-slate-50/60'
-                                    }`}
+                                    } ${isTransitioning ? 'opacity-75 cursor-not-allowed' : ''}`}
                             >
                                 <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 bg-slate-50 text-slate-400 ${isSelected ? 'bg-blue-100/60 text-blue-600' : ''}`}>
                                     <Icon size={16} />
@@ -512,8 +553,8 @@ const RiskQuestionnaire: React.FC<RiskQuestionnaireProps> = ({ onComplete }) => 
 
                     <button
                         onClick={handleNext}
-                        disabled={!isAnswered}
-                        className={`px-5 py-2 rounded-lg font-bold text-[13px] transition-all flex items-center gap-1.5 ${isAnswered
+                        disabled={!isAnswered || isTransitioning}
+                        className={`px-5 py-2 rounded-lg font-bold text-[13px] transition-all flex items-center gap-1.5 ${isAnswered && !isTransitioning
                             ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-100'
                             : 'bg-slate-50 text-slate-300 cursor-not-allowed'
                             }`}

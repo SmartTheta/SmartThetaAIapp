@@ -410,6 +410,7 @@ export const RiskAssessmentPage = () => {
     };
 
     const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const questionsInSection = questions.filter(q => q.section === currentSection);
     const currentQuestion = questionsInSection[currentQuestionIdx];
@@ -421,7 +422,20 @@ export const RiskAssessmentPage = () => {
     };
 
     const handleAnswer = (questionId: string, value: string) => {
+        if (isTransitioning) return;
         setAnswers(prev => ({ ...prev, [questionId]: value }));
+
+        // Auto-advance logic: move to next question/section after a small delay for visual feedback
+        setIsTransitioning(true);
+        setTimeout(() => {
+            if (currentQuestionIdx < questionsInSection.length - 1) {
+                setCurrentQuestionIdx(prev => prev + 1);
+            } else if (currentSection < 2) {
+                setCurrentSection(prev => prev + 1);
+                setCurrentQuestionIdx(0);
+            }
+            setIsTransitioning(false);
+        }, 400); // 400ms delay to allow the user to see their selection (checkmark)
     };
 
     const answeredCount = Object.keys(answers).length;
@@ -490,11 +504,13 @@ export const RiskAssessmentPage = () => {
                                 <button
                                     key={opt.value}
                                     onClick={() => handleAnswer(qId, opt.value)}
+                                    disabled={isTransitioning}
                                     className={cn(
                                         "w-full text-left p-2.5 rounded-lg border-2 transition-all flex items-center justify-between group",
                                         isSelected
                                             ? "border-blue-600 bg-blue-50 shadow-sm translate-x-1"
-                                            : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+                                            : "border-slate-100 hover:border-slate-200 hover:bg-slate-50",
+                                        isTransitioning && "opacity-75 cursor-not-allowed"
                                     )}
                                 >
                                     <div className="flex items-center gap-3">
@@ -529,6 +545,7 @@ export const RiskAssessmentPage = () => {
                         {(currentSection > 0 || currentQuestionIdx > 0) && (
                             <button
                                 onClick={() => {
+                                    if (isTransitioning) return;
                                     if (currentQuestionIdx > 0) {
                                         setCurrentQuestionIdx(prev => prev - 1);
                                     } else {
@@ -537,7 +554,8 @@ export const RiskAssessmentPage = () => {
                                         setCurrentQuestionIdx(questions.filter(q => q.section === prevSection).length - 1);
                                     }
                                 }}
-                                className="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-[13px] whitespace-nowrap"
+                                disabled={isTransitioning}
+                                className="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-[13px] whitespace-nowrap disabled:opacity-50"
                             >
                                 Back
                             </button>
@@ -545,7 +563,7 @@ export const RiskAssessmentPage = () => {
                         {currentQuestionIdx < questionsInSection.length - 1 ? (
                             <button
                                 onClick={() => setCurrentQuestionIdx(prev => prev + 1)}
-                                disabled={!answers[currentQuestion.id]}
+                                disabled={!answers[currentQuestion.id] || isTransitioning}
                                 className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 group disabled:opacity-50 text-[13px] whitespace-nowrap"
                             >
                                 Next Question
@@ -557,7 +575,7 @@ export const RiskAssessmentPage = () => {
                                     setCurrentSection(prev => prev + 1);
                                     setCurrentQuestionIdx(0);
                                 }}
-                                disabled={!answers[currentQuestion.id]}
+                                disabled={!answers[currentQuestion.id] || isTransitioning}
                                 className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 group disabled:opacity-50 text-[13px] whitespace-nowrap"
                             >
                                 Next Section
@@ -566,7 +584,7 @@ export const RiskAssessmentPage = () => {
                         ) : (
                             <button
                                 onClick={handleSubmit}
-                                disabled={answeredCount < questions.length}
+                                disabled={answeredCount < questions.length || isTransitioning}
                                 className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50 flex items-center gap-2 group text-[13px] whitespace-nowrap"
                             >
                                 Analyze Portfolio

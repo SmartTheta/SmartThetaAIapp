@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, User, RefreshCw, Download } from 'lucide-react';
 import { RiskAssessmentResult } from './RiskAssessmentPage';
 
 export const RiskProfilePage = () => {
@@ -16,6 +16,10 @@ export const RiskProfilePage = () => {
             }
         }
     }, []);
+
+    const handleDownload = () => {
+        window.print();
+    };
 
     if (!results) {
         return (
@@ -71,10 +75,37 @@ export const RiskProfilePage = () => {
 
     return (
         <div className="max-w-7xl mx-auto">
+            <style>
+                {`
+                @media print {
+                    .no-print { display: none !important; }
+                    .max-w-7xl { max-width: 100% !important; margin: 0 !important; }
+                    .bg-slate-900 { background: #000 !important; color: #fff !important; }
+                    button { display: none !important; }
+                    body { background: white !important; }
+                }
+                `}
+            </style>
             {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">Your Risk Profile</h1>
-                <p className="text-slate-600">Based on your latest assessment, here's your personalized investment profile.</p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-900 mb-2">Your Risk Profile</h1>
+                    <p className="text-slate-600">Based on your latest assessment, here's your personalized investment profile.</p>
+                </div>
+                <div className="flex items-center gap-3 no-print">
+                    <button
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+                    >
+                        <Download size={16} /> Download Report
+                    </button>
+                    <button
+                        onClick={() => window.location.href = '/dashboard/risk-assessment'}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-semibold hover:bg-blue-100 transition-all shadow-sm"
+                    >
+                        <RefreshCw size={16} /> Retake Assessment
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -233,7 +264,7 @@ export const RiskProfilePage = () => {
                             onClick={() => window.location.href = '/dashboard/pricing'}
                             className="w-full bg-white text-slate-900 py-3 rounded-xl font-semibold mt-6 hover:bg-slate-100 transition-all"
                         >
-                            Continue to Portfolio Builder
+                            Continue to Investment Setup
                         </button>
                     </div>
                 </div>

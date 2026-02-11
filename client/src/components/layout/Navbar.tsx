@@ -19,14 +19,14 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
     ];
 
     return (
-        <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm transition-all duration-200">
-            <div className="max-w-7xl mx-auto px-6 lg:px-8">
-                <div className="flex justify-between items-center h-20">
+        <nav className="relative z-40 bg-white border-b border-gray-100 shadow-sm transition-all duration-200">
+            <div className="max-w-[1440px] mx-auto px-12">
+                <div className="flex justify-between items-center h-14">
                     {/* Left: SmartTheta Logo */}
                     <div className="flex-shrink-0">
                         <Link to="/" className="flex items-center gap-2 group">
-                            <img src="/theta1.png" alt="SmartTheta" className="h-10 w-auto group-hover:scale-105 transition-transform" />
-                            <span className="text-xl font-bold text-slate-900 tracking-tight hidden sm:block">SmartTheta</span>
+                            <img src="/theta1.png" alt="SmartTheta" className="h-8 w-auto group-hover:scale-105 transition-transform" />
+                            <span className="text-lg font-bold text-slate-900 tracking-tight hidden sm:block">SmartTheta</span>
                         </Link>
                     </div>
 
@@ -70,7 +70,7 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
                         </button>
                         <button
                             onClick={onSignUpClick}
-                            className="text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+                            className="text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
                         >
                             Sign Up
                         </button>
@@ -80,10 +80,10 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
                     <div className="lg:hidden flex items-center">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="bg-slate-50 p-2.5 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all"
+                            className="bg-slate-50 p-2 rounded-xl text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all"
                             aria-label="Toggle Menu"
                         >
-                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                         </button>
                     </div>
                 </div>
@@ -91,8 +91,8 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
 
             {/* Mobile Menu */}
             <div className={`lg:hidden fixed inset-x-0 bg-white border-t border-gray-100 shadow-2xl transition-all duration-300 ease-in-out transform ${isMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
-                <div className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 gap-4">
+                <div className="p-4 space-y-4">
+                    <div className="grid grid-cols-1 gap-3">
                         {navItems.map((item) => (
                             item.isHash ? (
                                 <a
@@ -115,13 +115,13 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
                             )
                         ))}
                     </div>
-                    <div className="pt-6 border-t border-slate-100 flex flex-col gap-4">
+                    <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
                         <button
                             onClick={() => {
                                 setIsMenuOpen(false);
                                 onLoginClick?.();
                             }}
-                            className="w-full py-4 text-lg font-bold text-slate-700 bg-white border border-slate-200 rounded-xl"
+                            className="w-full py-3 text-base font-bold text-slate-700 bg-white border border-slate-200 rounded-xl"
                         >
                             Login
                         </button>
@@ -130,7 +130,7 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
                                 setIsMenuOpen(false);
                                 onSignUpClick?.();
                             }}
-                            className="w-full py-4 text-lg font-bold text-white bg-blue-600 rounded-xl shadow-lg text-center"
+                            className="w-full py-3 text-base font-bold text-white bg-blue-600 rounded-xl shadow-lg text-center"
                         >
                             Sign Up
                         </button>

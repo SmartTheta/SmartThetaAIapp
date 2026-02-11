@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 
 import { HeroSection } from './components/sections/HeroSection';
+import { AIShowcase } from './components/sections/AIShowcase';
 import { ProblemSolution } from './components/sections/ProblemSolution';
 import { HowItWorks } from './components/sections/HowItWorks';
 import { CTABanner } from './components/sections/CTABanner';
@@ -36,6 +37,7 @@ function HomePage() {
   return (
     <div className="pb-0">
       <HeroSection />
+      <AIShowcase />
       <ProblemSolution />
       <HowItWorks />
       <CTABanner />
