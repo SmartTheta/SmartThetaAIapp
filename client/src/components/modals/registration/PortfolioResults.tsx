@@ -14,31 +14,47 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
     const allQs = riskSections.flatMap(s => s.questions);
 
     const scores = useMemo(() => {
-        if (Object.keys(riskAnswers).length < allQs.length) return null;
-
+        // Ensure we have answers for most questions (or all). 
+        // For robustness, calculate with available answers
         const getScore = (id: string) => riskAnswers[id] || 0;
 
-        // 1. Risk Capacity (RC)
-        const financialPosition = (getScore('q1') + getScore('q5') + getScore('q6')) / 3;
-        const timeHorizon = (getScore('q2') + getScore('q3')) / 2;
-        const humanCapital = getScore('q4');
-        const rc = (financialPosition * 0.4) + (timeHorizon * 0.3) + (humanCapital * 0.3);
+        // Helper to calculate section average
+        const getSectionAverage = (sectionIndex: number) => {
+            const qs = riskSections[sectionIndex].questions;
+            const total = qs.reduce((sum, q) => sum + getScore(q.id), 0);
+            return qs.length > 0 ? total / qs.length : 0;
+        };
 
-        // 2. Risk Tolerance (RT)
-        const emotionalComposure = (getScore('q7') + getScore('q8') + getScore('q9') + getScore('q12')) / 4;
-        const personality = (getScore('q10') + getScore('q13')) / 2;
-        const experience = getScore('q11');
-        const rt = (emotionalComposure * 0.35) + (personality * 0.35) + (experience * 0.30);
+        const rc = getSectionAverage(0); // Risk Capacity
+        const rt = getSectionAverage(1); // Risk Tolerance
+        const bbi = getSectionAverage(2); // Behavioral Bias (Rationality)
 
-        // 3. Behavioral Bias Index (BBI)
-        const cognitiveBias = (getScore('q14') + getScore('q15') + getScore('q16') + getScore('q17') + getScore('q18') + getScore('q19')) / 6;
-        const emotionalBias = getScore('q20');
-        const bbi = 1.0 - ((cognitiveBias * 0.6) + (emotionalBias * 0.4)) / 100;
+        // Weighted Score Strategy: 40% Capacity, 40% Tolerance, 20% Behavior
+        const finalRps = (rc * 0.4) + (rt * 0.4) + (bbi * 0.2);
 
-        const finalRps = Math.min(rc, rt) * bbi * 1.0;
+        // Determine Tier based on finalRps (0-100)
+        // Range checks: strict inclusion of boundaries
         const tier = tiers.find(t => finalRps >= t.range[0] && finalRps <= t.range[1]) || tiers[0];
 
-        return { rc, rt, bbi, finalRps, tier };
+        // Fallback for edge cases (e.g. score > 100? shouldn't happen, or score slightly off ranges)
+        // My ranges cover 0-29, 30-44, ..., 90-100.
+        // If finalRps is e.g. 29.5, it might be missed if ranges are integers.
+        // Let's refine the tier logic to be robust.
+        // Actually the previous logic `find` relies on ranges covering everything.
+        // I will use a simple if-else logic here or ensure tiers cover gaps.
+        // The tiers in RegistrationData.ts are integers (29, 30).
+        // Let's trust the find for now but add a fallback to closest tier if needed.
+        // Or better: use the same logic as RiskAssessmentPage.tsx for consistency.
+
+        let calculatedTier = tiers[0];
+        if (finalRps >= 90) calculatedTier = tiers[5];
+        else if (finalRps >= 75) calculatedTier = tiers[4];
+        else if (finalRps >= 60) calculatedTier = tiers[3];
+        else if (finalRps >= 45) calculatedTier = tiers[2];
+        else if (finalRps >= 30) calculatedTier = tiers[1];
+        else calculatedTier = tiers[0];
+
+        return { rc, rt, bbi, finalRps, tier: calculatedTier };
     }, [riskAnswers, allQs.length]);
 
     if (!scores) return null;
@@ -140,13 +156,13 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
                                     <div className="w-8 h-8 bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-colors">
                                         <Bot size={16} />
                                     </div>
-                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">Bias Index</span>
+                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">Rationality</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-slate-900">{scores.bbi.toFixed(2)}</span>
-                                    <span className="text-[10px] font-medium text-slate-400">Idx</span>
+                                    <span className="text-2xl font-bold text-slate-900">{Math.round(scores.bbi)}</span>
+                                    <span className="text-[10px] font-medium text-slate-400">Score</span>
                                 </div>
-                                <p className="text-[10px] text-slate-400 mt-1">Behavioral bias adjustment</p>
+                                <p className="text-[10px] text-slate-400 mt-1">Decision making quality</p>
                             </div>
                         </div>
                     </section>
@@ -201,4 +217,3 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
         </div>
     );
 };
-

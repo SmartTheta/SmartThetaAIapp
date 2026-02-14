@@ -14,7 +14,7 @@ export const Sidebar = () => {
     const menuItems = [
         { icon: ClipboardList, label: 'Risk Assessment', href: '/dashboard/risk-assessment' },
         { icon: UserCircle, label: 'Risk Profile', href: '/dashboard/risk-profile' },
-        { icon: LineChart, label: 'Portfolio Builder', href: '/dashboard/portfolio' },
+        { icon: LineChart, label: 'My Portfolio', href: '/dashboard/portfolio' },
     ];
 
     return (

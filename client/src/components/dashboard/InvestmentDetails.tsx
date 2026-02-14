@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, IndianRupee, Calendar, Zap, TrendingUp, Shield, ChevronRight } from 'lucide-react';
+import { Target, IndianRupee, Calendar, Zap, TrendingUp, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 interface InvestmentDetailsProps {
     onComplete: (data: { capital: number; strategy: 'sip' | 'lumpsum' | 'both' }) => void;
@@ -109,14 +109,14 @@ const InvestmentDetails: React.FC<InvestmentDetailsProps> = ({ onComplete }) => 
                             </div>
 
                             {/* KYC Notice */}
-                            <div className="p-5 bg-amber-50 rounded-2xl border-2 border-amber-100">
+                            <div className="p-5 bg-emerald-50 rounded-2xl border-2 border-emerald-100">
                                 <div className="flex items-start gap-3">
-                                    <div className="bg-amber-100 p-2 rounded-xl">
-                                        <Shield className="w-6 h-6 text-amber-600" />
+                                    <div className="bg-emerald-100 p-2 rounded-xl">
+                                        <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-amber-900 mb-1">KYC Required (முக்கியமானது)</p>
-                                        <p className="text-sm text-amber-800 font-medium">Next step: Complete KYC + e-Mandate for automated investments</p>
+                                        <p className="font-bold text-emerald-900 mb-1">KYC Verified & Complete</p>
+                                        <p className="text-sm text-emerald-800 font-medium">Your identity has been verified. You're ready to invest.</p>
                                     </div>
                                 </div>
                             </div>

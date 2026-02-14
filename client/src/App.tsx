@@ -21,6 +21,10 @@ import { OnboardingPortfolioPage } from './components/pages/dashboard/Onboarding
 import { KYCOnboardingPage } from './components/pages/dashboard/KYCOnboardingPage';
 import { PortfolioResultPage } from './components/pages/dashboard/PortfolioResultPage';
 import { PortfolioBuilderPage } from './components/pages/dashboard/PortfolioBuilderPage';
+import { PortfolioDashboardPage } from './components/pages/dashboard/PortfolioDashboardPage';
+import StockSelection from './components/pages/dashboard/StockSelection';
+import BrokerSelection from './components/pages/dashboard/BrokerSelection';
+import OrderExecution from './components/pages/dashboard/OrderExecution';
 
 const VerifyEmail = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -109,7 +113,19 @@ function App() {
         <Route path="/dashboard/portfolio-result" element={
           <PortfolioResultPage />
         } />
+        <Route path="/dashboard/stock-selection" element={
+          <StockSelection />
+        } />
+        <Route path="/dashboard/broker-selection" element={
+          <BrokerSelection />
+        } />
+        <Route path="/dashboard/order-execution" element={
+          <OrderExecution />
+        } />
         <Route path="/dashboard/portfolio" element={
+          <PortfolioDashboardPage />
+        } />
+        <Route path="/dashboard/portfolio-builder" element={
           <DashboardLayout>
             <PortfolioBuilderPage />
           </DashboardLayout>

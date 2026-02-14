@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { User, Clock, LayoutGrid, Briefcase, Shield, Settings, ChevronRight, AlertCircle } from 'lucide-react';
+import { User, Clock, LayoutGrid, Briefcase, Shield, Settings, ChevronRight, AlertCircle, UserCheck } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import RiskQuestionnaire, { RiskAssessmentResult } from '../components/dashboard/RiskQuestionnaire';
 import { AIAnalysisComplete } from '../components/modals/registration/AIAnalysisComplete';
+import { KYCComponent } from '../components/dashboard/KYCComponent';
 import InvestmentDetails from '../components/dashboard/InvestmentDetails';
 import PortfolioPreview from '../components/dashboard/PortfolioPreview';
 import { tiers } from '../components/modals/registration/RegistrationData';
 
-type OnboardingStage = 'idle' | 'risk-assessment' | 'pricing' | 'investment-details' | 'portfolio-preview';
+type OnboardingStage = 'idle' | 'risk-assessment' | 'pricing' | 'kyc' | 'investment-details' | 'portfolio-preview';
 
 export const Dashboard: React.FC = () => {
     const [onboardingStage, setOnboardingStage] = useState<OnboardingStage>('idle');
@@ -36,10 +37,11 @@ export const Dashboard: React.FC = () => {
 
 
     const sidebarItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, active: onboardingStage === 'portfolio-preview' },
         { id: 'assessment', label: 'Risk Assessment', icon: AlertCircle, active: onboardingStage === 'risk-assessment' },
-        { id: 'risk', label: 'Risk Profile', icon: Shield, active: false },
-        { id: 'portfolio', label: 'Portfolio Builder', icon: Briefcase, active: onboardingStage === 'investment-details' },
+        { id: 'risk', label: 'Risk Profile', icon: Shield, active: onboardingStage === 'pricing' },
+        { id: 'portfolio', label: 'Portfolio Setup', icon: Briefcase, active: onboardingStage === 'investment-details' },
+        { id: 'kyc', label: 'KYC Setup', icon: UserCheck, active: onboardingStage === 'kyc' },
+        { id: 'dashboard', label: 'Smart Basket', icon: LayoutGrid, active: onboardingStage === 'portfolio-preview' },
         { id: 'settings', label: 'Settings', icon: Settings },
     ];
 
@@ -136,7 +138,10 @@ export const Dashboard: React.FC = () => {
                         <div className="max-w-6xl mx-auto py-12 px-6">
                             <AIAnalysisComplete
                                 tier={tiers.find(t => t.id === assessmentResult.tier) || tiers[0]}
-                                onComplete={() => setOnboardingStage('investment-details')}
+                                onComplete={() => {
+                                    setOnboardingStage('investment-details');
+                                    window.scrollTo(0, 0);
+                                }}
                             />
                         </div>
                     )}
@@ -145,9 +150,20 @@ export const Dashboard: React.FC = () => {
                         <InvestmentDetails
                             onComplete={(data) => {
                                 setInvestmentData(data);
-                                setOnboardingStage('portfolio-preview');
+                                setOnboardingStage('kyc');
                             }}
                         />
+                    )}
+
+                    {onboardingStage === 'kyc' && (
+                        <div className="max-w-4xl mx-auto py-12 px-6">
+                            <KYCComponent
+                                onComplete={() => {
+                                    setOnboardingStage('portfolio-preview');
+                                    window.scrollTo(0, 0);
+                                }}
+                            />
+                        </div>
                     )}
 
                     {onboardingStage === 'portfolio-preview' && assessmentResult && investmentData && (

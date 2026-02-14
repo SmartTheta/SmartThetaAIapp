@@ -39,266 +39,251 @@ export const RiskAssessmentPage = () => {
     ];
 
     const questions = [
+        // SECTION 0: Risk Capacity (Questions 1-6)
         {
             id: 'q1',
             section: 0,
-            category: 'financial_position',
-            text: 'Financial Safety Net - Which best describes your current financial position?',
+            text: 'If you lost your income today, how long could you pay all your bills using your savings?',
             options: [
-                { value: 'A', score: 20, text: 'Minimal emergency fund, high debt (>50% DTI), little savings outside home' },
-                { value: 'B', score: 40, text: '3-6 months expenses saved, moderate debt (30-50% DTI), some investments' },
-                { value: 'C', score: 60, text: '6-12 months expenses saved, low debt (<30% DTI), diversified investments' },
-                { value: 'D', score: 80, text: '12+ months expenses saved, minimal debt, substantial liquid net worth' },
-                { value: 'E', score: 100, text: 'Financial independence achieved, passive income > expenses, significant net worth' },
+                { value: 'A', score: 25, text: 'Less than 3 months' },
+                { value: 'B', score: 50, text: '3 to 6 months' },
+                { value: 'C', score: 75, text: '6 to 12 months' },
+                { value: 'D', score: 100, text: 'More than 12 months' },
             ],
         },
         {
             id: 'q2',
             section: 0,
-            category: 'time_horizon',
-            text: 'Investment Time Horizon - When do you need to access the majority of invested funds?',
+            text: 'What percentage of your monthly income goes towards paying loans (home loan, car loan, personal loans)?',
             options: [
-                { value: 'A', score: 20, text: 'Within 2 years (home purchase, emergency needs)' },
-                { value: 'B', score: 40, text: '2-5 years (education, near-term major goal)' },
-                { value: 'C', score: 60, text: '5-10 years (child\'s education, mid-term retirement planning)' },
-                { value: 'D', score: 80, text: '10-20 years (retirement planning, long-term wealth)' },
-                { value: 'E', score: 100, text: '20+ years (early career, generational wealth, no near-term needs)' },
+                { value: 'A', score: 25, text: 'More than 50% of my income' },
+                { value: 'B', score: 50, text: '30% to 50% of my income' },
+                { value: 'C', score: 75, text: '10% to 30% of my income' },
+                { value: 'D', score: 100, text: 'Less than 10% (or no loans)' },
             ],
         },
         {
             id: 'q3',
             section: 0,
-            category: 'time_horizon',
-            text: 'Age and Retirement Proximity',
+            text: 'Do you have adequate insurance for yourself and your family?',
             options: [
-                { value: 'A', score: 20, text: '55+ years, retiring within 5 years' },
-                { value: 'B', score: 40, text: '45-55 years, 5-15 years to retirement' },
-                { value: 'C', score: 60, text: '35-45 years, mid-career, peak earning phase' },
-                { value: 'D', score: 80, text: '25-35 years, early career, decades to retirement' },
-                { value: 'E', score: 100, text: 'Under 25 years, just starting career' },
+                { value: 'A', score: 25, text: 'No life or health insurance' },
+                { value: 'B', score: 50, text: 'Basic health insurance only' },
+                { value: 'C', score: 75, text: 'Both life + health (covering 5-7 yrs income)' },
+                { value: 'D', score: 100, text: 'Comprehensive coverage (10x income + health)' },
             ],
         },
         {
             id: 'q4',
             section: 0,
-            category: 'human_capital',
-            text: 'Income Stability and Human Capital',
+            text: 'When will you need to use this money you\'re planning to invest?',
             options: [
-                { value: 'A', score: 20, text: 'Unstable income (freelance/gig), single income source, declining industry' },
-                { value: 'B', score: 40, text: 'Moderate stability (business owner, variable income), growing field' },
-                { value: 'C', score: 60, text: 'Stable salaried job, steady industry, good job security' },
-                { value: 'D', score: 80, text: 'Very stable (MNC/PSU/Govt), multiple income sources, high demand skills' },
-                { value: 'E', score: 100, text: 'Passive income established, not dependent on salary, recession-proof skills' },
+                { value: 'A', score: 25, text: 'Within 2 years' },
+                { value: 'B', score: 50, text: '2 to 5 years from now' },
+                { value: 'C', score: 75, text: '5 to 10 years from now' },
+                { value: 'D', score: 100, text: 'More than 10 years from now' },
             ],
         },
         {
             id: 'q5',
             section: 0,
-            category: 'financial_position',
-            text: 'Financial Dependents',
+            text: 'How stable is your main source of income?',
             options: [
-                { value: 'A', score: 20, text: '4+ dependents with significant obligations (education, elderly care)' },
-                { value: 'B', score: 40, text: '2-3 dependents with moderate obligations' },
-                { value: 'C', score: 60, text: '1-2 dependents, manageable obligations' },
-                { value: 'D', score: 80, text: '0-1 dependents, minimal obligations' },
-                { value: 'E', score: 100, text: 'No dependents, financially secure family, surplus capacity' },
+                { value: 'A', score: 25, text: 'Very uncertain (freelance/commission)' },
+                { value: 'B', score: 50, text: 'Somewhat stable (contract/business)' },
+                { value: 'C', score: 75, text: 'Stable (permanent job)' },
+                { value: 'D', score: 100, text: 'Very stable (Govt/Professional/Multiple)' },
             ],
         },
         {
             id: 'q6',
             section: 0,
-            category: 'financial_position',
-            text: 'Insurance and Risk Protection',
+            text: 'Do you expect any big expenses in the next 3 years (wedding, home, education)?',
             options: [
-                { value: 'A', score: 20, text: 'Minimal/no life and health insurance coverage' },
-                { value: 'B', score: 40, text: 'Basic coverage (3-5x income life, basic health)' },
-                { value: 'C', score: 60, text: 'Good coverage (5-10x income life, comprehensive health)' },
-                { value: 'D', score: 80, text: 'Comprehensive coverage (10x+ income, family health, disability)' },
-                { value: 'E', score: 100, text: 'Over-insured, all risks covered, additional umbrella policies' },
+                { value: 'A', score: 25, text: 'Yes, very soon (within 1 year)' },
+                { value: 'B', score: 50, text: 'Yes, within 2-3 years' },
+                { value: 'C', score: 75, text: 'Maybe, but not confirmed' },
+                { value: 'D', score: 100, text: 'No major expenses expected' },
             ],
         },
-        // Risk Tolerance (Q7-Q13)
+
+        // SECTION 1: Risk Tolerance (Questions 7-13)
         {
             id: 'q7',
             section: 1,
-            category: 'emotional_composure',
-            text: 'Volatility Stress Test (Sleep Test) - Your ₹10 lakh portfolio drops to ₹7 lakh in one month. You:',
+            text: 'Imagine you invested ₹10 lakhs. Within 6 months, it drops to ₹7 lakhs. What would you do?',
             options: [
-                { value: 'A', score: 20, text: 'Panic sell immediately, lose sleep, high anxiety' },
-                { value: 'B', score: 40, text: 'Worry significantly, consider selling, check portfolio daily' },
-                { value: 'C', score: 60, text: 'Uncomfortable but stay invested, seek reassurance' },
-                { value: 'D', score: 80, text: 'Calm, stay invested, check occasionally' },
-                { value: 'E', score: 100, text: 'View as opportunity, consider investing more, completely unbothered' },
+                { value: 'A', score: 25, text: 'Panic and sell immediately' },
+                { value: 'B', score: 50, text: 'Worry, stop investing, wait and watch' },
+                { value: 'C', score: 75, text: 'Concerned but continue investing' },
+                { value: 'D', score: 100, text: 'See it as buying opportunity, invest more' },
             ],
         },
         {
             id: 'q8',
             section: 1,
-            category: 'emotional_composure',
-            text: 'Loss vs Gain Sensitivity (Loss Aversion) - Which causes you more emotional distress?',
+            text: 'How much loss in your investment portfolio would cause you to lose sleep?',
             options: [
-                { value: 'A', score: 20, text: 'Losing ₹1 lakh feels 5x worse than gaining ₹1 lakh feels good' },
-                { value: 'B', score: 40, text: 'Losing ₹1 lakh feels 3x worse than equivalent gain' },
-                { value: 'C', score: 60, text: 'Losses and gains feel roughly equal in emotional impact' },
-                { value: 'D', score: 80, text: 'Gains feel slightly better than losses feel bad' },
-                { value: 'E', score: 100, text: 'Focus entirely on long-term, short-term losses barely register' },
+                { value: 'A', score: 25, text: 'Any loss at all, even 5%' },
+                { value: 'B', score: 50, text: '10-15% loss would worry me a lot' },
+                { value: 'C', score: 75, text: '20-25% loss would make me uncomfortable' },
+                { value: 'D', score: 100, text: 'Can handle 30-40% drops for long term' },
             ],
         },
         {
             id: 'q9',
             section: 1,
-            category: 'emotional_composure',
-            text: 'Past Behavior During Corrections - During 2020 crash or similar correction, you:',
+            text: 'If you made a wrong investment decision and lost money, how long would you feel bad?',
             options: [
-                { value: 'A', score: 20, text: 'Sold everything, moved to cash/FD, still recovering' },
-                { value: 'B', score: 40, text: 'Reduced equity significantly, took 1-2 years to recover allocation' },
-                { value: 'C', score: 60, text: 'Stayed invested but stopped SIPs/new investments' },
-                { value: 'D', score: 80, text: 'Continued SIPs, stayed disciplined, didn\'t check portfolio frequently' },
-                { value: 'E', score: 100, text: 'Increased investments, saw it as opportunity, deployed cash reserves' },
+                { value: 'A', score: 25, text: 'For months, I\'d keep thinking about it' },
+                { value: 'B', score: 50, text: 'For several weeks' },
+                { value: 'C', score: 75, text: 'For a few days, then move on' },
+                { value: 'D', score: 100, text: 'Accept quickly as learning experience' },
             ],
         },
         {
             id: 'q10',
             section: 1,
-            category: 'personality',
-            text: 'Personality - Openness and Emotional Stability - Which describes you best?',
+            text: 'How would you rate your understanding of investments and markets?',
             options: [
-                { value: 'A', score: 20, text: 'Prefer safety, worry often, avoid anything unfamiliar or risky' },
-                { value: 'B', score: 40, text: 'Generally cautious, some anxiety about financial decisions' },
-                { value: 'C', score: 60, text: 'Balanced - open to new ideas but need some reassurance' },
-                { value: 'D', score: 80, text: 'Enjoy exploring new strategies, stay calm under pressure' },
-                { value: 'E', score: 100, text: 'Highly experimental, thrive on uncertainty, exceptional composure' },
+                { value: 'A', score: 25, text: 'Beginner (FDs/Savings only)' },
+                { value: 'B', score: 50, text: 'Basic (Mutual Funds/Stocks concepts)' },
+                { value: 'C', score: 75, text: 'Intermediate (Asset allocation/Cycles)' },
+                { value: 'D', score: 100, text: 'Advanced (Active tracking/Ratios)' },
             ],
         },
         {
             id: 'q11',
             section: 1,
-            category: 'experience',
-            text: 'Investment Knowledge and Experience',
+            text: 'Have you ever invested in equity mutual funds or stocks during a market crash?',
             options: [
-                { value: 'A', score: 20, text: 'Beginner, <2 years investing, rely entirely on advisors' },
-                { value: 'B', score: 40, text: 'Basic knowledge, 2-5 years experience, understand fundamentals' },
-                { value: 'C', score: 60, text: 'Good knowledge, 5-10 years experience, can evaluate investments independently' },
-                { value: 'D', score: 80, text: 'Advanced knowledge, 10+ years, understand market cycles deeply' },
-                { value: 'E', score: 100, text: 'Expert level, professional experience, sophisticated strategies' },
+                { value: 'A', score: 25, text: 'No, only safe options (FD/PPF)' },
+                { value: 'B', score: 25, text: 'Invested but sold in panic' },
+                { value: 'C', score: 75, text: 'Stayed invested but stopped SIPs' },
+                { value: 'D', score: 100, text: 'Stayed invested and continued SIPs' },
             ],
         },
         {
             id: 'q12',
             section: 1,
-            category: 'emotional_composure',
-            text: 'Regret and Decision-Making Style - Which regret would bother you more?',
+            text: 'In general life, how comfortable are you with trying new experiences?',
             options: [
-                { value: 'A', score: 20, text: 'Making a risky investment that loses money (strong regret, dwell for months)' },
-                { value: 'B', score: 40, text: 'Investing in something volatile that drops (moderate regret)' },
-                { value: 'C', score: 60, text: 'Missing gains and losing money feel equally regrettable' },
-                { value: 'D', score: 80, text: 'Missing a great opportunity bothers me more than losses' },
-                { value: 'E', score: 100, text: 'Don\'t dwell on past decisions, focus on future (minimal regret)' },
+                { value: 'A', score: 25, text: 'Prefer familiar routines, avoid change' },
+                { value: 'B', score: 50, text: 'Cautious but willing after research' },
+                { value: 'C', score: 75, text: 'Enjoy new experiences, adapt well' },
+                { value: 'D', score: 100, text: 'Actively seek new challenges' },
             ],
         },
         {
             id: 'q13',
             section: 1,
-            category: 'personality',
-            text: 'Focus and Return Expectations - When reviewing your portfolio, you focus primarily on:',
+            text: 'When facing uncertain situations in life, how do you typically react?',
             options: [
-                { value: 'A', score: 20, text: 'Avoiding any losses, need guaranteed returns, check daily' },
-                { value: 'B', score: 40, text: 'Stability and steady returns, acceptable to slightly lag inflation' },
-                { value: 'C', score: 60, text: 'Beating inflation, willing to accept moderate volatility' },
-                { value: 'D', score: 80, text: 'Long-term growth, accept significant short-term swings' },
-                { value: 'E', score: 100, text: 'Maximum long-term returns, embrace volatility as opportunity' },
+                { value: 'A', score: 25, text: 'Get very anxious and stressed' },
+                { value: 'B', score: 50, text: 'Feel worried but can manage' },
+                { value: 'C', score: 75, text: 'Stay fairly calm and think rationally' },
+                { value: 'D', score: 100, text: 'Remain very calm, see it as challenge' },
             ],
         },
-        // Behavioral Bias (Q14-Q20)
+
+        // SECTION 2: Behavioral Bias (Questions 14-22)
         {
             id: 'q14',
             section: 2,
-            category: 'cognitive_bias',
-            text: 'Overconfidence Check - Rate your investment skill vs professional fund managers:',
+            text: 'How would you rate your ability to pick good investments?',
             options: [
-                { value: 'A', score: 20, text: 'I can consistently outperform them with my stock picks' },
-                { value: 'B', score: 40, text: 'I can beat them occasionally by timing market and picking winners' },
-                { value: 'C', score: 60, text: 'I can match their returns with right research' },
-                { value: 'D', score: 80, text: 'They likely have an edge due to resources and experience' },
-                { value: 'E', score: 100, text: 'I should index and let them compete; market efficiency is real' },
+                { value: 'A', score: 25, text: 'No confidence; need expert guidance' },
+                { value: 'B', score: 50, text: 'Some decisions but prefer validation' },
+                { value: 'C', score: 75, text: 'Confident in my research and decisions' },
+                { value: 'D', score: 100, text: 'Very confident; often beat market' },
             ],
         },
         {
             id: 'q15',
             section: 2,
-            category: 'cognitive_bias',
-            text: 'Anchoring Bias - Stock bought at ₹1000 is now ₹700. Fundamentals unchanged. You think:',
+            text: 'A stock was ₹500, now ₹700. Friend says it\'s a buy. What do you think?',
             options: [
-                { value: 'A', score: 20, text: 'Won\'t sell until it gets back to ₹1000 (my purchase price)' },
-                { value: 'B', score: 40, text: 'Feel anchored to ₹1000 but consider selling if fundamentals change' },
-                { value: 'C', score: 60, text: 'Purchase price matters somewhat but evaluate current value' },
-                { value: 'D', score: 80, text: 'Purchase price irrelevant, only current value and future potential matter' },
-                { value: 'E', score: 100, text: 'View ₹700 as discount to intrinsic value, consider buying more' },
+                { value: 'A', score: 25, text: 'Too expensive; wait for ₹500' },
+                { value: 'B', score: 50, text: 'Uncomfortable buying at ₹700' },
+                { value: 'C', score: 75, text: 'Re-evaluate without thinking of ₹500' },
+                { value: 'D', score: 100, text: 'If fundamentals support, old price irrelevant' },
             ],
         },
         {
             id: 'q16',
             section: 2,
-            category: 'cognitive_bias',
-            text: 'Herding and Social Influence - When everyone around you is excited about a hot investment:',
+            text: 'When researching an investment, which approach do you typically follow?',
             options: [
-                { value: 'A', score: 20, text: 'FOMO - immediately invest without research, don\'t want to miss out' },
-                { value: 'B', score: 40, text: 'Feel pressure to join, do quick research and likely invest' },
-                { value: 'C', score: 60, text: 'Consider it but do thorough research before deciding' },
-                { value: 'D', score: 80, text: 'Skeptical of crowd behavior, avoid most trendy investments' },
-                { value: 'E', score: 100, text: 'Contrarian signal - when everyone\'s buying, I\'m cautious or selling' },
+                { value: 'A', score: 25, text: 'Look for info that confirms my belief' },
+                { value: 'B', score: 50, text: 'Mostly positive reviews, glance at negative' },
+                { value: 'C', score: 75, text: 'Look at both positive and negative equally' },
+                { value: 'D', score: 100, text: 'Actively seek opposing views' },
             ],
         },
         {
             id: 'q17',
             section: 2,
-            category: 'cognitive_bias',
-            text: 'Confirmation Bias - When researching an investment you\'re excited about:',
+            text: 'How much do recent news headlines affect your investment decisions?',
             options: [
-                { value: 'A', score: 20, text: 'Only seek positive information that confirms my belief' },
-                { value: 'B', score: 40, text: 'Mostly look for supporting evidence, briefly check risks' },
-                { value: 'C', score: 60, text: 'Balanced research, look at both pros and cons' },
-                { value: 'D', score: 80, text: 'Actively seek contradicting views, play devil\'s advocate' },
-                { value: 'E', score: 100, text: 'Start by looking for reasons NOT to invest (inversion thinking)' },
+                { value: 'A', score: 25, text: 'A lot – often decide based on news' },
+                { value: 'B', score: 50, text: 'Quite a bit – events stay in mind' },
+                { value: 'C', score: 75, text: 'Somewhat – aware but try to ignore' },
+                { value: 'D', score: 100, text: 'Very little – focus on fundamentals' },
             ],
         },
         {
             id: 'q18',
             section: 2,
-            category: 'cognitive_bias',
-            text: 'Availability Bias (Recency) - Recent market crash news makes you feel:',
+            text: 'Everyone you know is investing in a hot sector. What do you do?',
             options: [
-                { value: 'A', score: 20, text: 'Another crash is imminent, must reduce equity now' },
-                { value: 'B', score: 40, text: 'Market is very risky right now, should be cautious' },
-                { value: 'C', score: 60, text: 'Aware but don\'t let recent news significantly change strategy' },
-                { value: 'D', score: 80, text: 'Recent news is noise, focus on long-term data and trends' },
-                { value: 'E', score: 100, text: 'Headlines are contrary indicator, ignore completely' },
+                { value: 'A', score: 25, text: 'Jump in quickly – must be good' },
+                { value: 'B', score: 50, text: 'Feel pressured but worried' },
+                { value: 'C', score: 75, text: 'Research independently before deciding' },
+                { value: 'D', score: 100, text: 'Often avoid – cautious when everyone buys' },
             ],
         },
         {
             id: 'q19',
             section: 2,
-            category: 'cognitive_bias',
-            text: 'Mental Accounting - You receive ₹2 lakh bonus. How do you view it for investing?',
+            text: 'You have ₹5L savings and get ₹2L bonus. How do you invest the bonus?',
             options: [
-                { value: 'A', score: 20, text: '\'Fun money\' - take more risks than with regular savings' },
-                { value: 'B', score: 40, text: 'Different bucket from salary, slightly more risk acceptable' },
-                { value: 'C', score: 60, text: 'Somewhat separate but generally follow same strategy' },
-                { value: 'D', score: 80, text: 'All money is same, follow consistent investment approach' },
-                { value: 'E', score: 100, text: 'Money is fungible, optimize based on tax and overall portfolio' },
+                { value: 'A', score: 25, text: 'Treat differently – take more risk' },
+                { value: 'B', score: 50, text: 'Separate bucket – specific purpose' },
+                { value: 'C', score: 75, text: 'View separate initially but plan' },
+                { value: 'D', score: 100, text: 'See as ₹7L total, one strategy' },
             ],
         },
         {
             id: 'q20',
             section: 2,
-            category: 'emotional_bias',
-            text: 'Status Quo and Change Resistance - Advisor suggests rebalancing your portfolio:',
+            text: 'If your investments gain ₹50k vs losing ₹50k, which affects you more?',
             options: [
-                { value: 'A', score: 20, text: 'Very uncomfortable, strongly resist any changes' },
-                { value: 'B', score: 40, text: 'Hesitant, need a lot of convincing to make changes' },
-                { value: 'C', score: 60, text: 'Open to changes if rationale is clear' },
-                { value: 'D', score: 80, text: 'Welcome periodic rebalancing, understand the logic' },
-                { value: 'E', score: 100, text: 'Actively seek portfolio optimization opportunities' },
+                { value: 'A', score: 25, text: 'Loss affects me 3-4x more' },
+                { value: 'B', score: 50, text: 'Loss affects me 2x more' },
+                { value: 'C', score: 75, text: 'Roughly equal' },
+                { value: 'D', score: 100, text: 'Focus on learning, not emotion' },
+            ],
+        },
+        {
+            id: 'q21',
+            section: 2,
+            text: 'When your investment does well or poorly, what do you think?',
+            options: [
+                { value: 'A', score: 25, text: 'Gains=Skill, Losses=Bad Luck' },
+                { value: 'B', score: 50, text: 'Gains=Confidence, Losses=Self Doubt' },
+                { value: 'C', score: 75, text: 'Both are partly luck, partly skill' },
+                { value: 'D', score: 100, text: 'Learn from both objectively' },
+            ],
+        },
+        {
+            id: 'q22',
+            section: 2,
+            text: 'Advisor suggests moving money for better long-term returns. How do you feel?',
+            options: [
+                { value: 'A', score: 25, text: 'Very uncomfortable – keep as is' },
+                { value: 'B', score: 50, text: 'Hesitant – need convincing' },
+                { value: 'C', score: 75, text: 'Open if reasoning makes sense' },
+                { value: 'D', score: 100, text: 'Comfortable with change' },
             ],
         },
     ];
@@ -312,21 +297,20 @@ export const RiskAssessmentPage = () => {
             return option?.score || 0;
         };
 
-        const financialPosition = (getScore('q1') + getScore('q5') + getScore('q6')) / 3;
-        const timeHorizon = (getScore('q2') + getScore('q3')) / 2;
-        const humanCapital = getScore('q4');
-        const riskCapacity = (financialPosition * 0.4) + (timeHorizon * 0.3) + (humanCapital * 0.3);
+        // Calculate average score per section (0-100 scale)
+        const categories = [0, 1, 2].map(sectionIdx => {
+            const sectionQuestions = questions.filter(q => q.section === sectionIdx);
+            const totalScore = sectionQuestions.reduce((sum, q) => sum + getScore(q.id), 0);
+            return sectionQuestions.length > 0 ? totalScore / sectionQuestions.length : 0;
+        });
 
-        const emotionalComposure = (getScore('q7') + getScore('q8') + getScore('q9') + getScore('q12')) / 4;
-        const personality = (getScore('q10') + getScore('q13')) / 2;
-        const experience = getScore('q11');
-        const riskTolerance = (emotionalComposure * 0.35) + (personality * 0.35) + (experience * 0.30);
+        const riskCapacity = categories[0];
+        const riskTolerance = categories[1];
+        const behavioralScore = categories[2];
 
-        const cognitiveBias = (getScore('q14') + getScore('q15') + getScore('q16') + getScore('q17') + getScore('q18') + getScore('q19')) / 6;
-        const emotionalBias = getScore('q20');
-        const behavioralBias = 1.0 - ((cognitiveBias * 0.6) + (emotionalBias * 0.4)) / 100;
-
-        const finalScore = Math.min(riskCapacity, riskTolerance) * behavioralBias;
+        // Weighted Score Strategy: 40% Capacity, 40% Tolerance, 20% Behavior (Rationality)
+        // High Score = High Risk Capacity/Tolerance/Rationality = Aggressive Profile
+        const finalScore = (riskCapacity * 0.4) + (riskTolerance * 0.4) + (behavioralScore * 0.2);
 
         // Determine constraining factor
         const diff = Math.abs(riskCapacity - riskTolerance);
@@ -337,65 +321,66 @@ export const RiskAssessmentPage = () => {
 
         // Analyze behavioral insights
         const analyzeBias = (score: number): 'Low' | 'Moderate' | 'High' => {
-            if (score >= 70) return 'Low';
+            if (score >= 70) return 'Low'; // Higher score = more rational = low bias
             if (score >= 40) return 'Moderate';
-            return 'High';
+            return 'High'; // Low score = high bias
         };
 
+        // Mapping to new questions for insights
         const behavioralInsights = {
-            lossAversion: analyzeBias(getScore('q7')),
-            regretSensitivity: analyzeBias(getScore('q12')),
-            anchoring: analyzeBias(getScore('q15')),
-            overconfidence: analyzeBias(getScore('q14')),
-            herding: analyzeBias(getScore('q16')),
+            lossAversion: analyzeBias(getScore('q20')), // Loss vs Gain
+            regretSensitivity: analyzeBias(getScore('q9')), // Past mistake regret
+            anchoring: analyzeBias(getScore('q15')), // Anchoring 500->700
+            overconfidence: analyzeBias(getScore('q14')), // Skill vs Pros
+            herding: analyzeBias(getScore('q18')), // Hot sector
         };
 
         let tier = 1; let tierName = ''; let tierDescription = '';
         let allocation = { equity: '', debt: '', gold: '' };
 
-        if (finalScore >= 86) {
+        if (finalScore >= 90) {
             tier = 6; tierName = 'Ultra-Aggressive'; tierDescription = 'Maximum wealth creation with concentrated positions';
             allocation = { equity: '90-95%', debt: '0-5%', gold: '5-10%' };
-        } else if (finalScore >= 71) {
+        } else if (finalScore >= 75) {
             tier = 5; tierName = 'Aggressive Growth'; tierDescription = 'Strong focus on wealth creation with high equity exposure';
             allocation = { equity: '80-90%', debt: '5-15%', gold: '5%' };
-        } else if (finalScore >= 56) {
+        } else if (finalScore >= 60) {
             tier = 4; tierName = 'Growth Focused'; tierDescription = 'Long-term wealth creation with managed volatility';
             allocation = { equity: '65-80%', debt: '15-30%', gold: '5%' };
-        } else if (finalScore >= 36) {
+        } else if (finalScore >= 45) {
             tier = 3; tierName = 'Moderate Balanced'; tierDescription = 'Balance between growth and stability';
             allocation = { equity: '45-60%', debt: '35-45%', gold: '5-10%' };
-        } else if (finalScore >= 16) {
+        } else if (finalScore >= 30) {
             tier = 2; tierName = 'Conservative Income'; tierDescription = 'Prioritizes steady income and stability';
             allocation = { equity: '20-35%', debt: '60-70%', gold: '5-10%' };
         } else {
-            tier = 1; tierName = 'Capital Preservation'; tierDescription = 'Safety and capital protection above all';
+            tier = 1; tierName = 'Safety First'; tierDescription = 'Safety and capital protection above all';
             allocation = { equity: '5-15%', debt: '75-85%', gold: '10%' };
         }
 
-        // Default goal based on time horizon
-        const timeHorizonScore = timeHorizon;
+        // Default goal based on time horizon (Q4)
+        const timeHorizonScore = getScore('q4'); // 25 to 100
         let goalType = 'Retirement Planning';
         let goalTimeframe = '(10-20 years)';
 
-        if (timeHorizonScore >= 80) {
+        if (timeHorizonScore >= 90) { // More than 10 years
             goalType = 'Wealth Accumulation';
             goalTimeframe = '(15+ years)';
-        } else if (timeHorizonScore >= 60) {
+        } else if (timeHorizonScore >= 70) { // 5-10 years
             goalType = 'Retirement Planning';
             goalTimeframe = '(10-20 years)';
-        } else if (timeHorizonScore >= 40) {
+        } else if (timeHorizonScore >= 50) { // 2-5 years
             goalType = 'Education Planning';
             goalTimeframe = '(5-15 years)';
         } else {
             goalType = 'Near-term Goal';
-            goalTimeframe = '(2-7 years)';
+            goalTimeframe = '(2-5 years)';
         }
 
         return {
             riskCapacity,
             riskTolerance,
-            behavioralBias,
+            behavioralBias: behavioralScore,
             finalScore,
             tier,
             tierName,

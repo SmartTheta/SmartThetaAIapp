@@ -1,14 +1,27 @@
+
 import React from 'react';
-import { Bot, CheckCircle2, Globe, ChevronDown, Bell, Binary, Wallet, ShieldCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Bot, CheckCircle2, Globe, ChevronDown, Bell, Binary, Wallet, ShieldCheck, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '../../../lib/utils';
+
+import { LucideIcon } from 'lucide-react';
+
+export interface OnboardingStep {
+    name: string;
+    icon: LucideIcon;
+    path: string;
+    status?: 'current' | 'upcoming' | 'completed';
+}
 
 interface OnboardingLayoutProps {
     children: React.ReactNode;
     currentStep: number;
+    steps?: OnboardingStep[];
     mode?: 'ai' | 'classic';
     setMode?: (mode: 'ai' | 'classic') => void;
     showModeToggle?: boolean;
+    customHeader?: React.ReactNode;
+    maxWidth?: string;
 }
 
 export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
@@ -16,16 +29,29 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
     currentStep,
     mode,
     setMode,
-    showModeToggle = false
+    showModeToggle = false,
+    customHeader,
+    maxWidth,
+    steps: customSteps
 }) => {
-    const steps = [
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        // Clear any session/onboarding data
+        sessionStorage.clear();
+        navigate('/');
+    };
+
+    const defaultSteps = [
         { name: 'Portfolio Setup', status: 'current', icon: Bot, path: '/onboarding/portfolio' },
         { name: 'KYC Setup', status: 'upcoming', icon: ShieldCheck, path: '/onboarding/kyc' },
-        { name: 'Portfolio Review', status: 'upcoming', icon: CheckCircle2, path: '/dashboard/portfolio-result' },
+        { name: 'Smart Basket', status: 'upcoming', icon: CheckCircle2, path: '/dashboard/stock-selection' },
         { name: 'Connect Broker', status: 'upcoming', icon: Wallet, path: '#' },
     ];
 
-    const updatedSteps = steps.map((step, idx) => {
+    const stepsToRender = customSteps || defaultSteps;
+
+    const updatedSteps = stepsToRender.map((step, idx) => {
         if (idx < currentStep) return { ...step, status: 'completed' };
         if (idx === currentStep) return { ...step, status: 'current' };
         return { ...step, status: 'upcoming' };
@@ -77,14 +103,23 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
                 </nav>
 
                 <div className="p-6 mt-auto border-t border-slate-800/50">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white uppercase">
-                            S
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white uppercase shrink-0">
+                                S
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-xs font-bold text-white truncate">Sri</p>
+                                <p className="text-[10px] text-slate-500 truncate font-medium uppercase tracking-wider">Onboarding</p>
+                            </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold text-white truncate">Sri</p>
-                            <p className="text-[10px] text-slate-500 truncate font-medium uppercase tracking-wider">Onboarding</p>
-                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            title="Log Out"
+                        >
+                            <LogOut className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
             </aside>
@@ -93,34 +128,36 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Topbar */}
                 <header className="h-16 bg-white flex items-center justify-between px-8 shrink-0 relative z-20 border-b border-slate-200">
-                    <div className="flex items-center gap-4">
-                        {showModeToggle && setMode && (
-                            <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200">
-                                <button
-                                    onClick={() => setMode('ai')}
-                                    className={cn(
-                                        "px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all",
-                                        mode === 'ai'
-                                            ? "bg-white text-blue-600 shadow-sm border border-slate-200"
-                                            : "text-slate-600 hover:text-slate-900"
-                                    )}
-                                >
-                                    <Bot size={14} />
-                                    AI Mode
-                                </button>
-                                <button
-                                    onClick={() => setMode('classic')}
-                                    className={cn(
-                                        "px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all",
-                                        mode === 'classic'
-                                            ? "bg-white text-blue-600 shadow-sm border border-slate-200"
-                                            : "text-slate-600 hover:text-slate-900"
-                                    )}
-                                >
-                                    <Binary size={14} />
-                                    Classic Mode
-                                </button>
-                            </div>
+                    <div className="flex items-center gap-4 flex-1">
+                        {customHeader ? customHeader : (
+                            showModeToggle && setMode && (
+                                <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200">
+                                    <button
+                                        onClick={() => setMode('ai')}
+                                        className={cn(
+                                            "px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all",
+                                            mode === 'ai'
+                                                ? "bg-white text-blue-600 shadow-sm border border-slate-200"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        )}
+                                    >
+                                        <Bot size={14} />
+                                        AI Mode
+                                    </button>
+                                    <button
+                                        onClick={() => setMode('classic')}
+                                        className={cn(
+                                            "px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all",
+                                            mode === 'classic'
+                                                ? "bg-white text-blue-600 shadow-sm border border-slate-200"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        )}
+                                    >
+                                        <Binary size={14} />
+                                        Classic Mode
+                                    </button>
+                                </div>
+                            )
                         )}
                     </div>
 
@@ -162,6 +199,15 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
                                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border-2 border-white"></span>
                             </button>
 
+                            {/* Header Logout Button */}
+                            <button
+                                onClick={handleLogout}
+                                className="hover:text-red-500 transition-colors"
+                                title="Log Out"
+                            >
+                                <LogOut className="w-5 h-5" />
+                            </button>
+
                             <div className="flex items-center gap-3 ml-2">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-xs font-bold text-slate-900 leading-none">Sri</p>
@@ -177,7 +223,7 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
 
                 {/* Content */}
                 <main className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#f8fafc]">
-                    <div className="max-w-4xl mx-auto">
+                    <div className={cn("mx-auto", maxWidth || "max-w-4xl")}>
                         {children}
                     </div>
                 </main>
