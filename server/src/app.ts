@@ -4,6 +4,7 @@ import cors from 'cors';
 import indexRoutes from './routes/index';
 import scannerRoutes from './routes/scanner';
 import stockRoutes from './routes/stocks';
+import brokerRoutes from './routes/broker';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/index', indexRoutes);
 app.use('/api/scanner', scannerRoutes);
 app.use('/api/stocks', stockRoutes);
+app.use('/api/broker', brokerRoutes);
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {

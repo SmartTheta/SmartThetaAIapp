@@ -12,7 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/speakeasy": "^2.0.10",
+    "@types/tough-cookie": "^4.0.5",
     "axios": "^1.13.2",
+    "axios-cookiejar-support": "^6.0.5",
     "cors": "^2.8.5",
     "csv-parse": "^5.5.5",
     "dotenv": "^16.4.5",
@@ -20,6 +23,9 @@
     "kiteconnect": "^5.1.0",
     "mongoose": "^8.2.0",
     "node-cron": "^3.0.3",
+    "otplib": "^13.3.0",
+    "speakeasy": "^2.0.0",
+    "tough-cookie": "^6.0.0",
     "yahoo-finance2": "^3.13.0"
   },
   "devDependencies": {
