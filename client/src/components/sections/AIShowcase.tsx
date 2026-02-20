@@ -78,20 +78,20 @@ export const AIShowcase = () => {
                     </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center h-[320px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-center min-h-[400px] md:h-[320px]">
 
                     {/* Left: Data Input */}
-                    <div className="relative h-full flex flex-col justify-center items-center md:items-end pr-8 border-r border-slate-800/50">
+                    <div className="relative h-48 md:h-full flex flex-col justify-center items-center md:items-end md:pr-8 border-b md:border-b-0 md:border-r border-slate-800/50 pb-8 md:pb-0">
                         <div className="text-slate-500 text-[10px] mb-6 font-mono tracking-widest uppercase">Raw Market Data</div>
-                        <div className="relative w-32 h-48 flex flex-col justify-center gap-3">
+                        <div className="relative w-32 h-32 md:h-48 flex flex-col justify-center gap-3">
                             <InputTicker symbol="NIFTY 50" delay={0} />
                             <InputTicker symbol="BANKNIFTY" delay={0.5} />
                             <InputTicker symbol="RELIANCE" delay={1} />
                             <InputTicker symbol="HDFCBANK" delay={1.5} />
                             <InputTicker symbol="INFY" delay={2} />
 
-                            {/* Flow Lines */}
-                            <svg className="absolute top-0 right-[-40px] w-20 h-full overflow-visible opacity-20">
+                            {/* Flow Lines - Hidden on mobile for cleaner look */}
+                            <svg className="hidden md:block absolute top-0 right-[-40px] w-20 h-full overflow-visible opacity-20">
                                 <motion.path
                                     d="M0,32 C40,32 40,128 80,128"
                                     fill="none"
@@ -115,7 +115,7 @@ export const AIShowcase = () => {
                     </div>
 
                     {/* Center: AI Core */}
-                    <div className="relative flex justify-center items-center">
+                    <div className="relative flex justify-center items-center py-8 md:py-0">
                         {/* Core Glow */}
                         <div className="absolute w-48 h-48 bg-blue-500/20 rounded-full blur-[80px]" />
 
@@ -154,9 +154,9 @@ export const AIShowcase = () => {
                     </div>
 
                     {/* Right: Insights Output */}
-                    <div className="relative h-full flex flex-col justify-center items-center md:items-start pl-8 border-l border-slate-800/50">
+                    <div className="relative h-48 md:h-full flex flex-col justify-center items-center md:items-start md:pl-8 border-t md:border-t-0 md:border-l border-slate-800/50 pt-8 md:pt-0">
                         <div className="text-slate-500 text-[10px] mb-6 font-mono tracking-widest uppercase">Actionable Insights</div>
-                        <div className="relative w-48 h-48 flex flex-col justify-center gap-4">
+                        <div className="relative w-48 h-32 md:h-48 flex flex-col justify-center gap-4">
                             <OutputSignal text="BUY SIGNAL" delay={0.5} color="bg-green-500/20 text-green-400 border-green-500/50" />
                             <OutputSignal text="HIGH PROBABILITY" delay={1.5} color="bg-blue-500/20 text-blue-400 border-blue-500/50" />
                             <OutputSignal text="TREND REVERSAL" delay={2.5} color="bg-purple-500/20 text-purple-400 border-purple-500/50" />

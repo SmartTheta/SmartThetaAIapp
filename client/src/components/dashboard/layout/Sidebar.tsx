@@ -3,12 +3,17 @@ import {
     UserCircle,
     LineChart,
     Settings,
-    LogOut
+    LogOut,
+    X
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../../../lib/utils';
 
-export const Sidebar = () => {
+interface SidebarProps {
+    onClose?: () => void;
+}
+
+export const Sidebar = ({ onClose }: SidebarProps) => {
     const location = useLocation();
 
     const menuItems = [
@@ -20,11 +25,21 @@ export const Sidebar = () => {
     return (
         <aside className="w-64 bg-[#1e293b] text-slate-300 flex flex-col h-full border-r border-slate-800">
             {/* Logo Section */}
-            <div className="p-6 mb-4">
-                <Link to="/" className="flex items-center gap-2 group">
+            <div className="p-6 mb-4 flex items-center justify-between">
+                <Link to="/" className="flex items-center gap-2 group" onClick={onClose}>
                     <img src="/theta1.png" alt="SmartTheta" className="h-8 w-auto" />
                     <span className="text-xl font-extrabold text-white tracking-tight">SmartTheta</span>
                 </Link>
+                {/* Close button — only visible on mobile */}
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                        aria-label="Close sidebar"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                )}
             </div>
 
             {/* Navigation Links */}
@@ -35,6 +50,7 @@ export const Sidebar = () => {
                         <Link
                             key={item.href}
                             to={item.href}
+                            onClick={onClose}
                             className={cn(
                                 "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group",
                                 isActive

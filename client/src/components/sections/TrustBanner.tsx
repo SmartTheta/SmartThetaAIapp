@@ -11,7 +11,7 @@ export const TrustBanner = () => {
 
     return (
         <div className="w-full bg-[#F7F9FC] border-y border-[#E5E7EB]">
-            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
                 <div className="flex flex-col items-center gap-10">
 
                     {/* Top Text */}

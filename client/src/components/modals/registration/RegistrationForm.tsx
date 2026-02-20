@@ -176,7 +176,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="relative">
                     <label className={labelStyle}>Password</label>
                     <input

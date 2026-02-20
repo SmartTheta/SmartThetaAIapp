@@ -32,9 +32,7 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
         // Weighted Score Strategy: 40% Capacity, 40% Tolerance, 20% Behavior
         const finalRps = (rc * 0.4) + (rt * 0.4) + (bbi * 0.2);
 
-        // Determine Tier based on finalRps (0-100)
-        // Range checks: strict inclusion of boundaries
-        const tier = tiers.find(t => finalRps >= t.range[0] && finalRps <= t.range[1]) || tiers[0];
+
 
         // Fallback for edge cases (e.g. score > 100? shouldn't happen, or score slightly off ranges)
         // My ranges cover 0-29, 30-44, ..., 90-100.
@@ -60,27 +58,27 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
     if (!scores) return null;
 
     return (
-        <div className="flex flex-col md:flex-row h-full animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white">
+        <div className="flex flex-col lg:flex-row h-full animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white">
             {/* Left Sidebar: Summary & Profile */}
-            <div className="w-full md:w-[320px] bg-slate-50 p-8 border-r border-slate-100 flex flex-col">
-                <div className="mb-8">
-                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
-                        <ShieldCheck className="text-white w-6 h-6" />
+            <div className="w-full lg:w-[320px] bg-slate-50 p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-slate-100 flex flex-col shrink-0">
+                <div className="mb-6 sm:mb-8">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
+                        <ShieldCheck className="text-white w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-1">Risk Profile</h1>
-                    <p className="text-sm text-slate-500 font-medium">Analysis complete based on your responses</p>
+                    <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">Risk Profile</h1>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium">Analysis complete based on your responses</p>
                 </div>
 
-                <div className="flex-grow space-y-6">
+                <div className="flex-grow space-y-4 sm:space-y-6">
                     {/* Tier Card */}
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-1">Recommended Tier</p>
-                        <h2 className="text-xl font-bold text-slate-900 leading-tight">Tier {scores.tier.id}: {scores.tier.name}</h2>
+                    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <p className="text-[10px] sm:text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-1">Recommended Tier</p>
+                        <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Tier {scores.tier.id}: {scores.tier.name}</h2>
 
                         <div className="mt-4 pt-4 border-t border-slate-50">
                             <div className="flex justify-between items-end mb-1">
-                                <span className="text-xs font-semibold text-slate-500">Risk Score</span>
-                                <span className="text-2xl font-black text-blue-600">{Math.round(scores.finalRps)}<span className="text-xs text-slate-400 font-normal ml-0.5">/100</span></span>
+                                <span className="text-[11px] sm:text-xs font-semibold text-slate-500">Risk Score</span>
+                                <span className="text-xl sm:text-2xl font-black text-blue-600">{Math.round(scores.finalRps)}<span className="text-xs text-slate-400 font-normal ml-0.5">/100</span></span>
                             </div>
                             <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                                 <div
@@ -93,20 +91,20 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
 
                     <div className="space-y-3">
                         <div className="flex items-center gap-3 text-slate-600">
-                            <Shield size={16} className="text-blue-500" />
-                            <span className="text-xs font-medium">Standard Volatility Protection</span>
+                            <Shield size={14} className="text-blue-500 sm:w-4 sm:h-4" />
+                            <span className="text-[11px] sm:text-xs font-medium">Standard Volatility Protection</span>
                         </div>
                         <div className="flex items-center gap-3 text-slate-600">
-                            <TrendingUp size={16} className="text-blue-500" />
-                            <span className="text-xs font-medium">Optimized for Long-term Growth</span>
+                            <TrendingUp size={14} className="text-blue-500 sm:w-4 sm:h-4" />
+                            <span className="text-[11px] sm:text-xs font-medium">Optimized for Long-term Growth</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Continue Action in Sidebar for Desktop */}
+                {/* Continue Action in Sidebar for Desktop/Mobile */}
                 <button
                     onClick={() => onComplete(scores.tier)}
-                    className="mt-8 w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl flex items-center justify-center gap-2 group"
+                    className="mt-6 sm:mt-8 w-full bg-slate-900 text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-xl flex items-center justify-center gap-2 group"
                 >
                     Continue to Builder
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -114,52 +112,52 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
             </div>
 
             {/* Right Main Content: Detailed Metrics & Allocation */}
-            <div className="flex-grow p-8 bg-white">
-                <div className="max-w-3xl mx-auto space-y-8">
+            <div className="flex-grow p-6 sm:p-8 bg-white overflow-y-auto">
+                <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
                     {/* Metrics Grid */}
                     <section>
-                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Risk Foundation Metrics</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <h3 className="text-[11px] sm:text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Risk Foundation Metrics</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                             {/* Capacity */}
-                            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-colors group">
+                            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-colors group">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                                         <TrendingUp size={16} />
                                     </div>
-                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">Capacity</span>
+                                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-tight">Capacity</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-slate-900">{Math.round(scores.rc)}</span>
+                                    <span className="text-xl sm:text-2xl font-bold text-slate-900">{Math.round(scores.rc)}</span>
                                     <span className="text-[10px] font-medium text-slate-400">Score</span>
                                 </div>
                                 <p className="text-[10px] text-slate-400 mt-1">Financial ability to absorb loss</p>
                             </div>
 
                             {/* Tolerance */}
-                            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-purple-200 transition-colors group">
+                            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-purple-200 transition-colors group">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
                                         <PieChart size={16} />
                                     </div>
-                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">Tolerance</span>
+                                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-tight">Tolerance</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-slate-900">{Math.round(scores.rt)}</span>
+                                    <span className="text-xl sm:text-2xl font-bold text-slate-900">{Math.round(scores.rt)}</span>
                                     <span className="text-[10px] font-medium text-slate-400">Score</span>
                                 </div>
                                 <p className="text-[10px] text-slate-400 mt-1">Emotional comfort with risk</p>
                             </div>
 
                             {/* Bias */}
-                            <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-slate-200 transition-colors group">
+                            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-slate-200 transition-colors group">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-8 h-8 bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-colors">
                                         <Bot size={16} />
                                     </div>
-                                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">Rationality</span>
+                                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-tight">Rationality</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-slate-900">{Math.round(scores.bbi)}</span>
+                                    <span className="text-xl sm:text-2xl font-bold text-slate-900">{Math.round(scores.bbi)}</span>
                                     <span className="text-[10px] font-medium text-slate-400">Score</span>
                                 </div>
                                 <p className="text-[10px] text-slate-400 mt-1">Decision making quality</p>
@@ -169,10 +167,10 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
 
                     {/* Asset Allocation */}
                     <section>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Recommended Allocation</h3>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+                            <h3 className="text-[11px] sm:text-sm font-bold text-slate-400 uppercase tracking-widest">Recommended Allocation</h3>
                             <div className="px-3 py-1 bg-blue-50 rounded-full">
-                                <span className="text-[10px] font-bold text-blue-600">OPTIMIZED FOR YOU</span>
+                                <span className="text-[10px] font-bold text-blue-600 uppercase">Optimized For You</span>
                             </div>
                         </div>
 
@@ -183,10 +181,10 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
                                 { label: 'Gold / Alts', value: scores.tier.gold, color: 'bg-amber-400', icon: TrendingUp, desc: 'Inflation hedge and diversification' }
                             ].map((asset, idx) => (
                                 <div key={idx} className="flex items-center gap-4 p-4 rounded-xl border border-slate-50 hover:bg-slate-50 transition-colors group">
-                                    <div className={`w-10 h-10 ${asset.color} rounded-lg flex items-center justify-center text-white shrink-0`}>
-                                        <asset.icon size={20} />
+                                    <div className={`w-9 h-9 sm:w-10 sm:h-10 ${asset.color} rounded-lg flex items-center justify-center text-white shrink-0`}>
+                                        <asset.icon className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                                     </div>
-                                    <div className="flex-grow">
+                                    <div className="flex-grow min-w-0">
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-sm font-bold text-slate-900">{asset.label}</span>
                                             <span className="text-sm font-black text-slate-900">{asset.value}</span>
@@ -198,7 +196,7 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
                                                     style={{ width: asset.value }}
                                                 />
                                             </div>
-                                            <p className="text-[11px] text-slate-400 whitespace-nowrap hidden sm:block">{asset.desc}</p>
+                                            <p className="text-[10px] text-slate-400 truncate hidden sm:block">{asset.desc}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -207,7 +205,7 @@ export const PortfolioResults: React.FC<PortfolioResultsProps> = ({
                     </section>
 
                     {/* Disclaimer/Footer */}
-                    <div className="pt-4 border-t border-slate-100">
+                    <div className="pt-4 border-t border-slate-100 pb-4">
                         <p className="text-[10px] text-slate-400 leading-relaxed">
                             This risk profile is based on your provided answers and should be used as a guide only. SmartTheta's AI adjusts these allocations based on real-time market conditions.
                         </p>

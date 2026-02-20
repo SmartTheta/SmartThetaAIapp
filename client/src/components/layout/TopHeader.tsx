@@ -58,7 +58,7 @@ export const TopHeader = () => {
 
     return (
         <div className="relative z-50 bg-slate-950 text-white py-1.5 shadow-md border-b border-slate-800">
-            <div className="max-w-[1440px] mx-auto px-12">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
                 <div className="flex justify-between items-center h-7 text-[11px] sm:text-xs font-medium">
 
                     {/* Left Anchor: Current Time (IST) */}
@@ -109,7 +109,7 @@ export const TopHeader = () => {
                     {/* Right Anchor: Market Status Symbol */}
                     <div className="flex items-center gap-2 flex-shrink-0 pl-4 border-l border-slate-800">
                         <div className={cn("w-2 h-2 rounded-full animate-pulse", isMarketOpen ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]")} />
-                        <span className={cn("uppercase tracking-widest opacity-80", isMarketOpen ? "text-green-400" : "text-red-400")}>
+                        <span className={cn("hidden xs:inline uppercase tracking-widest opacity-80", isMarketOpen ? "text-green-400" : "text-red-400")}>
                             {isMarketOpen ? "Market Open" : "Market Closed"}
                         </span>
                     </div>

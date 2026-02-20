@@ -20,7 +20,7 @@ export const Navbar = ({ onSignUpClick, onLoginClick }: NavbarProps) => {
 
     return (
         <nav className="relative z-40 bg-white border-b border-gray-100 shadow-sm transition-all duration-200">
-            <div className="max-w-[1440px] mx-auto px-12">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12">
                 <div className="flex justify-between items-center h-14">
                     {/* Left: SmartTheta Logo */}
                     <div className="flex-shrink-0">

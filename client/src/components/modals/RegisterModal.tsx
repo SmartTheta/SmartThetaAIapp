@@ -64,42 +64,47 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
 
-            <div className={`relative w-full ${step === 5 ? 'max-w-6xl' : step === 4 ? 'max-w-5xl' : step === 3 ? 'max-w-3xl' : 'max-w-[460px]'} bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col transition-all duration-300`}>
+            <div className={`relative w-full ${step === 5 ? 'max-w-6xl' :
+                    step === 4 ? 'max-w-5xl' :
+                        step === 3 ? 'max-w-3xl' :
+                            'max-w-[480px]'
+                } bg-white rounded-[24px] sm:rounded-[32px] shadow-2xl overflow-hidden flex flex-col transition-all duration-300 max-h-[95vh] sm:max-h-[90vh]`}>
 
                 {/* Header */}
                 {step < 4 && step !== 5 && (
-                    <div className="px-8 pt-8 pb-4 flex justify-between items-start text-left shrink-0">
+                    <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-3 sm:pb-4 flex justify-between items-start text-left shrink-0">
                         <div className="space-y-0.5">
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center overflow-hidden">
+                            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center overflow-hidden">
                                     <img src="/theta1.png" className="w-full h-full object-contain" alt="ST" />
                                 </div>
-                                <span className="text-[14px] font-bold text-slate-900">SmartTheta</span>
+                                <span className="text-[13px] sm:text-[14px] font-bold text-slate-900">SmartTheta</span>
                             </div>
-                            <h2 className="text-[28px] font-bold text-slate-900 leading-tight">
+                            <h2 className="text-[22px] sm:text-[28px] font-bold text-slate-900 leading-tight">
                                 {step === 1 ? 'Create Account' : step === 2 ? 'Select Language' : 'Investor Profile'}
                             </h2>
-                            <p className="text-[13px] text-slate-500 font-medium tracking-tight">
+                            <p className="text-[12px] sm:text-[13px] text-slate-500 font-medium tracking-tight">
                                 {step === 1 ? 'Start your AI-powered investment journey.' : step === 2 ? 'Customize your experience.' : 'Analyze your risk tolerance.'}
                             </p>
                         </div>
-                        <button onClick={onClose} className="p-1 -mr-1 text-slate-400 hover:text-slate-600 transition-colors">
-                            <X size={22} />
+                        <button onClick={onClose} className="p-2 -mr-2 text-slate-400 hover:text-slate-600 transition-colors">
+                            <X size={20} className="sm:w-6 sm:h-6" />
                         </button>
                     </div>
                 )}
 
                 {/* Content Area */}
-                <div className={`px-8 py-4 ${step === 4 || step === 5 ? 'overflow-y-auto custom-scrollbar' : 'overflow-y-auto custom-scrollbar'} flex-grow ${step === 4 || step === 5 ? 'max-h-[80vh]' : 'max-h-[70vh]'}`}>
+                <div className={`px-5 sm:px-8 py-4 overflow-y-auto custom-scrollbar flex-grow`}>
                     {step === 1 && (
                         <RegistrationForm
                             formData={formData}
                             setFormData={setFormData}
                             errors={errors}
                             validate={validate}
+                            onLoginClick={onLoginClick}
                         />
                     )}
 
@@ -139,7 +144,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
 
                 {/* Footer Link (Step 1 only) */}
                 {step === 1 && (
-                    <div className="py-4 border-t border-slate-50 bg-slate-50/50 text-center shrink-0">
+                    <div className="py-4 border-t border-slate-50 bg-slate-50/50 text-center shrink-0 px-4">
                         <p className="text-[12px] font-medium text-slate-500">
                             Already have an account? <button onClick={onLoginClick} className="text-blue-600 font-bold hover:underline">Login</button>
                         </p>

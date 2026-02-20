@@ -315,36 +315,40 @@ const StockSelection: React.FC = () => {
   }
 
   const CustomHeader = (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Your Smart Basket</h1>
-          <p className="text-xs text-slate-500 font-medium">
-            {basketWithLivePrices?.strategy} • {basketWithLivePrices?.totalStocks} stocks
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 py-2 sm:py-0">
+      <div className="flex items-center gap-3">
+        <div className="hidden xs:block">
+          <h1 className="text-sm sm:text-lg font-bold text-slate-900 leading-tight truncate max-w-[150px] sm:max-w-none">
+            {basketWithLivePrices?.strategy}
+          </h1>
+          <p className="text-[10px] text-slate-500 font-medium">
+            {basketWithLivePrices?.totalStocks} individual stocks
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
         <button
           onClick={refreshAllPrices}
           disabled={isRefreshingPrices}
-          className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition disabled:opacity-50"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition disabled:opacity-50"
         >
-          <RefreshCcw className={`w-3.5 h-3.5 ${isRefreshingPrices ? 'animate-spin' : ''}`} />
-          <span className="text-xs font-bold hidden sm:inline">Refresh</span>
+          <RefreshCcw size={14} className={isRefreshingPrices ? 'animate-spin' : ''} />
+          <span className="text-[10px] sm:text-xs font-bold">Refresh</span>
         </button>
 
-        <div className="flex items-center gap-4 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-100">
+        <div className="flex items-center gap-2 sm:gap-4 bg-slate-50 px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg border border-slate-100">
           <div>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Capital</p>
-            <p className="font-bold text-slate-900 text-sm">₹{userCapital.toLocaleString('en-IN')}</p>
+            <p className="text-[8px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Invested</p>
+            <p className="font-bold text-green-600 text-[11px] sm:text-sm">
+              ₹{basketWithLivePrices?.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 }) || 0}
+            </p>
           </div>
           <div className="w-px h-6 bg-slate-200" />
           <div>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Invested</p>
-            <p className="font-bold text-green-600 text-sm">
-              ₹{basketWithLivePrices?.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 }) || 0}
+            <p className="text-[8px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Unused</p>
+            <p className="font-bold text-slate-600 text-[11px] sm:text-sm">
+              ₹{basketWithLivePrices?.unusedCapital.toLocaleString('en-IN', { maximumFractionDigits: 0 }) || 0}
             </p>
           </div>
         </div>
@@ -355,22 +359,22 @@ const StockSelection: React.FC = () => {
   return (
     <OnboardingLayout currentStep={2} customHeader={CustomHeader} maxWidth="w-full">
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <main className="max-w-6xl mx-auto px-6 py-8">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
           {/* Strategy Info */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white mb-8">
-            <div className="flex items-start gap-4">
-              <div className="bg-white/20 p-3 rounded-xl">
-                <Package className="w-6 h-6" />
+          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 sm:p-6 text-white mb-6 sm:mb-8 shadow-lg shadow-blue-200">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+              <div className="bg-white/20 p-3 rounded-xl w-fit">
+                <Package className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold mb-1">{basketWithLivePrices?.strategy}</h2>
-                <p className="text-blue-100 text-sm mb-4">
+                <h2 className="text-lg sm:text-xl font-bold mb-1">{basketWithLivePrices?.strategy}</h2>
+                <p className="text-blue-100 text-[13px] sm:text-sm mb-4">
                   AI-curated basket based on your risk profile. Diversified across{' '}
                   {basketWithLivePrices?.diversification.sectors.length} sectors.
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {basketWithLivePrices?.diversification.sectors.map(sector => (
-                    <span key={sector} className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                    <span key={sector} className="px-2.5 py-1 bg-white/10 rounded-lg text-[10px] sm:text-xs font-medium border border-white/10">
                       {sector}
                     </span>
                   ))}
@@ -378,9 +382,9 @@ const StockSelection: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-white text-blue-600 px-4 py-2 rounded-xl font-bold hover:bg-blue-50 transition flex items-center gap-2"
+                className="bg-white text-blue-600 px-4 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition flex items-center justify-center gap-2 text-sm sm:text-base mt-2 sm:mt-0"
               >
-                <Plus className="w-4 h-4" />
+                <Plus size={18} />
                 Add Stock
               </button>
             </div>
@@ -390,61 +394,59 @@ const StockSelection: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl border border-slate-200 p-6 mb-8"
+            className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 mb-6 sm:mb-8 shadow-sm"
           >
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-5 sm:mb-6">
               <Sparkles className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-bold text-slate-900">Recommended Allocation</h3>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900">Portfolio Mix Recommendation</h3>
             </div>
 
             <div className="space-y-3">
-              {assetAllocation.map((category, idx) => {
+              {assetAllocation.map((category) => {
                 const colorMap: Record<string, { bg: string; border: string; text: string }> = {
-                  'Equity (ETFs)': { bg: 'bg-blue-50', border: 'border-l-blue-500', text: 'text-blue-600' },
-                  'Debt (Funds & Bonds)': { bg: 'bg-green-50', border: 'border-l-green-500', text: 'text-green-600' },
-                  'Gold': { bg: 'bg-yellow-50', border: 'border-l-yellow-500', text: 'text-yellow-600' },
+                  'Equity (ETFs)': { bg: 'bg-blue-50/50', border: 'border-l-blue-500', text: 'text-blue-600' },
+                  'Debt (Funds & Bonds)': { bg: 'bg-emerald-50/50', border: 'border-l-emerald-500', text: 'text-emerald-600' },
+                  'Gold': { bg: 'bg-amber-50/50', border: 'border-l-amber-500', text: 'text-amber-600' },
                 };
-                const colors = colorMap[category.category] || { bg: 'bg-purple-50', border: 'border-l-purple-500', text: 'text-purple-600' };
+                const colors = colorMap[category.category] || { bg: 'bg-purple-50/50', border: 'border-l-purple-500', text: 'text-purple-600' };
 
                 return (
                   <div
                     key={category.category}
-                    className={`${colors.bg} rounded-xl p-4 border-l-4 ${colors.border}`}
+                    className={`${colors.bg} rounded-xl p-3.5 sm:p-4 border-l-4 ${colors.border} flex items-center justify-between`}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="font-bold text-slate-900">{category.category}</p>
-                        <p className="text-sm text-slate-500">
-                          {category.assets.map(a => a.asset.name).join(', ')}
-                        </p>
+                    <div className="min-w-0 flex-1 pr-4">
+                      <p className="font-bold text-slate-900 text-sm sm:text-base leading-tight mb-0.5">{category.category}</p>
+                      <p className="text-[11px] sm:text-sm text-slate-500 truncate">
+                        {category.assets.map(a => a.asset.name).join(', ')}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <span className={`text-lg sm:text-2xl font-black ${colors.text}`}>{category.totalPercentage}%</span>
                       </div>
-                      <div className="text-right">
-                        <p className={`text-2xl font-bold ${colors.text}`}>{category.totalPercentage}%</p>
-                        <p className="text-sm text-slate-500">₹{category.totalAmount.toLocaleString('en-IN')}</p>
-                      </div>
+                      <p className="text-[11px] sm:text-sm text-slate-500 font-bold tracking-tight">₹{category.totalAmount.toLocaleString('en-IN')}</p>
                     </div>
                   </div>
                 );
               })}
 
-              {/* Direct Stocks */}
+              {/* Direct Stocks Allocation Summary */}
               {basketWithLivePrices && basketWithLivePrices.items.length > 0 && (
-                <div className="bg-purple-50 rounded-xl p-4 border-l-4 border-l-purple-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-slate-900">Direct Stocks</p>
-                      <p className="text-sm text-slate-500">
-                        {basketWithLivePrices.totalStocks} individual stocks
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-purple-600">
-                        {Math.round((basketWithLivePrices.totalAmount / userCapital) * 100)}%
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        ₹{basketWithLivePrices.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                      </p>
-                    </div>
+                <div className="bg-indigo-50/50 rounded-xl p-3.5 sm:p-4 border-l-4 border-l-indigo-500 flex items-center justify-between">
+                  <div className="min-w-0 flex-1 pr-4">
+                    <p className="font-bold text-slate-900 text-sm sm:text-base mb-0.5">Direct Stocks Portfolio</p>
+                    <p className="text-[11px] sm:text-sm text-slate-500">
+                      {basketWithLivePrices.totalStocks} individual securities
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-lg sm:text-2xl font-black text-indigo-600 leading-tight">
+                      {Math.round((basketWithLivePrices.totalAmount / userCapital) * 100)}%
+                    </p>
+                    <p className="text-[11px] sm:text-sm text-slate-500 font-bold tracking-tight">
+                      ₹{basketWithLivePrices.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </p>
                   </div>
                 </div>
               )}
@@ -455,20 +457,20 @@ const StockSelection: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl border border-slate-200 p-6 mb-8"
+            className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 mb-6 sm:mb-8 shadow-sm"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Fine-tune Your Risk</h3>
-                <p className="text-sm text-slate-500">Answer a few quick questions to adjust your portfolio risk level</p>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">Fine-tune Your Risk</h3>
+                <p className="text-[13px] sm:text-sm text-slate-500">Adjust your portfolio risk level manually</p>
               </div>
-              <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition">
-                <Target className="w-5 h-5" />
-                <span className="font-medium">Adjust Risk</span>
-              </button>
+              <div className="flex items-center gap-2 text-blue-600 sm:font-medium text-sm">
+                <Target size={18} />
+                <span>Selected Risk: {currentTierInfo?.riskLevel}</span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <button
                 onClick={() => {
                   if (currentTier > 1) {
@@ -476,10 +478,10 @@ const StockSelection: React.FC = () => {
                   }
                 }}
                 disabled={currentTier <= 1}
-                className="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="p-3 sm:p-4 border-2 border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <Shield className="w-5 h-5 text-blue-600" />
-                <span className="font-bold text-blue-600">Lower Risk</span>
+                <Shield size={18} className="text-blue-600 sm:size-5" />
+                <span className="font-bold text-blue-600 text-[13px] sm:text-base">Lower Risk</span>
               </button>
               <button
                 onClick={() => {
@@ -488,10 +490,10 @@ const StockSelection: React.FC = () => {
                   }
                 }}
                 disabled={currentTier >= 6}
-                className="p-4 border-2 border-slate-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="p-3 sm:p-4 border-2 border-slate-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <TrendingUp className="w-5 h-5 text-orange-600" />
-                <span className="font-bold text-orange-600">Higher Risk</span>
+                <TrendingUp size={18} className="text-orange-600 sm:size-5" />
+                <span className="font-bold text-orange-600 text-[13px] sm:text-base">Higher Risk</span>
               </button>
             </div>
           </motion.div>
@@ -523,14 +525,60 @@ const StockSelection: React.FC = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className="p-4 hover:bg-slate-50 transition"
+                    className="p-4 sm:p-5 hover:bg-slate-50 transition"
                   >
-                    <div className="flex items-center gap-4">
+                    {/* Mobile View */}
+                    <div className="flex sm:hidden flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-bold text-slate-900 text-base">{item.stock.symbol}</p>
+                          <p className="text-[11px] text-slate-500 truncate max-w-[150px]">{item.stock.name}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-slate-900">₹{item.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                          <p className="text-[10px] text-slate-500 font-bold">{item.allocation.toFixed(1)}% weight</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <div className="text-center">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Units</p>
+                            <p className="font-bold text-slate-900">{item.units}</p>
+                          </div>
+                          <div className="w-px h-6 bg-slate-200" />
+                          <div>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase">Price</p>
+                            <p className="font-bold text-slate-900 text-xs">₹{priceData.price.toLocaleString('en-IN')}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingItem(item);
+                              setEditUnits(item.units);
+                            }}
+                            className="p-2 text-blue-600 bg-white border border-blue-100 rounded-lg shadow-sm"
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleRemove(item.stock.symbol)}
+                            className="p-2 text-red-500 bg-white border border-red-100 rounded-lg shadow-sm"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop View */}
+                    <div className="hidden sm:flex items-center gap-4">
                       {/* Stock Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-bold text-slate-900">{item.stock.symbol}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${item.stock.riskCategory === 'Low' ? 'bg-green-100 text-green-700' :
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${item.stock.riskCategory === 'Low' ? 'bg-green-100 text-green-700' :
                             item.stock.riskCategory === 'Moderate' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-orange-100 text-orange-700'
                             }`}>
@@ -538,22 +586,21 @@ const StockSelection: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-sm text-slate-500 truncate">{item.stock.name}</p>
-                        <p className="text-xs text-slate-400 mt-1">{item.reason}</p>
+                        <p className="text-xs text-slate-400 mt-1 italic">{item.reason}</p>
                       </div>
 
                       {/* Units */}
-                      <div className="text-center">
-                        <p className="text-xs text-slate-500">Units</p>
-                        <p className="text-lg font-bold text-slate-900">{item.units}</p>
+                      <div className="text-center min-w-[80px]">
+                        <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Units</p>
+                        <p className="text-lg font-black text-slate-900 leading-none">{item.units}</p>
                         <button
                           onClick={() => {
                             setEditingItem(item);
                             setEditUnits(item.units);
                           }}
-                          className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-1"
+                          className="text-[10px] text-blue-600 hover:text-blue-700 font-bold mt-2 hover:underline"
                         >
-                          <Edit3 className="w-3 h-3" />
-                          Edit
+                          Modify
                         </button>
                       </div>
 
@@ -564,28 +611,37 @@ const StockSelection: React.FC = () => {
                         ) : (
                           <>
                             <p className="font-bold text-slate-900">₹{priceData.price.toLocaleString('en-IN')}</p>
-                            <p className={`text-xs flex items-center justify-end gap-1 ${priceData.isLive ? 'text-green-600' : 'text-slate-400'
+                            <p className={`text-[10px] flex items-center justify-end gap-1.5 ${priceData.isLive ? 'text-green-600 font-bold' : 'text-slate-400 font-medium'
                               }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${priceData.isLive ? 'bg-green-500' : 'bg-slate-300'
+                              <span className={`w-1.5 h-1.5 rounded-full ${priceData.isLive ? 'bg-green-500 animate-pulse' : 'bg-slate-300'
                                 }`} />
-                              {priceData.isLive ? 'Live' : 'Static'}
+                              {priceData.isLive ? 'Real-time' : 'Latest'}
                             </p>
                           </>
                         )}
                       </div>
 
                       {/* Amount & Allocation */}
-                      <div className="text-right min-w-[120px]">
-                        <p className="font-bold text-slate-900">
+                      <div className="text-right min-w-[130px]">
+                        <p className="font-black text-slate-900 text-lg">
                           ₹{item.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                         </p>
-                        <p className="text-xs text-slate-500">{item.allocation.toFixed(1)}% of basket</p>
+                        <div className="flex items-center justify-end gap-2 mt-1">
+                          <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-500 rounded-full"
+                              style={{ width: `${item.allocation}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-bold">{item.allocation.toFixed(1)}%</span>
+                        </div>
                       </div>
 
                       {/* Remove */}
                       <button
                         onClick={() => handleRemove(item.stock.symbol)}
-                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                        className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all ml-2"
+                        title="Remove Stock"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -597,28 +653,28 @@ const StockSelection: React.FC = () => {
           </div>
 
           {/* Summary & Proceed */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Total Stocks</p>
-                <p className="text-2xl font-bold text-slate-900">{basketWithLivePrices?.totalStocks}</p>
+          <div className="bg-white rounded-2xl border-2 border-slate-100 p-5 sm:p-8 shadow-lg shadow-slate-100 mb-20">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Stocks</p>
+                <p className="text-xl sm:text-3xl font-black text-slate-900">{basketWithLivePrices?.totalStocks}</p>
               </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Total Investment</p>
-                <p className="text-2xl font-bold text-green-600">
+              <div className="p-4 bg-green-50/50 rounded-xl border border-green-100">
+                <p className="text-[10px] sm:text-xs text-green-600 font-bold uppercase tracking-wider mb-1">Invested Value</p>
+                <p className="text-xl sm:text-3xl font-black text-green-600">
                   ₹{basketWithLivePrices?.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Unused Capital</p>
-                <p className="text-2xl font-bold text-slate-600">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Remaining</p>
+                <p className="text-xl sm:text-3xl font-black text-slate-600">
                   ₹{basketWithLivePrices?.unusedCapital.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">Sectors</p>
-                <p className="text-2xl font-bold text-slate-900">
-                  {basketWithLivePrices?.diversification.sectors.length}
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Diversification</p>
+                <p className="text-xl sm:text-3xl font-black text-slate-900">
+                  {basketWithLivePrices?.diversification.sectors.length} <span className="text-sm font-bold text-slate-400">Sectors</span>
                 </p>
               </div>
             </div>
@@ -626,10 +682,10 @@ const StockSelection: React.FC = () => {
             <button
               onClick={handleProceed}
               disabled={!basketWithLivePrices || basketWithLivePrices.items.length === 0}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 sm:py-5 rounded-2xl font-black text-lg sm:text-xl hover:from-green-600 hover:to-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl shadow-green-100 active:scale-[0.98]"
             >
-              Proceed to Broker
-              <ChevronRight className="w-5 h-5" />
+              Confirm and Proceed to Broker
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
         </main>
@@ -645,49 +701,63 @@ const StockSelection: React.FC = () => {
               onClick={() => setEditingItem(null)}
             >
               <motion.div
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-3xl shadow-2xl max-w-sm w-[95%] p-6 sm:p-8"
                 onClick={e => e.stopPropagation()}
               >
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Edit Units - {editingItem.stock.symbol}</h3>
-
-                <div className="flex items-center gap-4 mb-6">
-                  <button
-                    onClick={() => setEditUnits(Math.max(1, editUnits - 1))}
-                    className="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 transition"
-                  >
-                    <Minus className="w-5 h-5" />
-                  </button>
-                  <input
-                    type="number"
-                    value={editUnits}
-                    onChange={e => setEditUnits(Math.max(1, Number(e.target.value)))}
-                    className="flex-1 text-center text-2xl font-bold px-4 py-3 border border-slate-200 rounded-xl"
-                  />
-                  <button
-                    onClick={() => setEditUnits(editUnits + 1)}
-                    className="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 transition"
-                  >
-                    <Plus className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Edit Units</h3>
+                  <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 rounded-lg">
+                    <X size={20} />
                   </button>
                 </div>
 
-                <p className="text-center text-slate-600 mb-6">
-                  New Amount: <strong>₹{(editUnits * editingItem.price).toLocaleString('en-IN')}</strong>
-                </p>
+                <div className="mb-6">
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{editingItem.stock.symbol}</p>
+                  <p className="text-slate-600 font-medium line-clamp-1">{editingItem.stock.name}</p>
+                </div>
+
+                <div className="flex items-center gap-3 mb-8">
+                  <button
+                    onClick={() => setEditUnits(Math.max(1, editUnits - 1))}
+                    className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-50 border-2 border-slate-100 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition active:scale-95"
+                  >
+                    <Minus className="w-6 h-6 text-slate-600" />
+                  </button>
+                  <div className="flex-1 text-center">
+                    <input
+                      type="number"
+                      value={editUnits}
+                      onChange={e => setEditUnits(Math.max(1, Number(e.target.value)))}
+                      className="w-full text-center text-3xl sm:text-4xl font-black bg-transparent outline-none focus:text-blue-600 transition"
+                    />
+                    <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase mt-1">Total Units</p>
+                  </div>
+                  <button
+                    onClick={() => setEditUnits(editUnits + 1)}
+                    className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-50 border-2 border-blue-100 rounded-2xl flex items-center justify-center hover:bg-blue-100 transition active:scale-95"
+                  >
+                    <Plus className="w-6 h-6 text-blue-600" />
+                  </button>
+                </div>
+
+                <div className="bg-slate-50 rounded-2x p-5 border border-slate-100 mb-8 flex items-center justify-between">
+                  <span className="text-sm font-bold text-slate-500">New Value</span>
+                  <span className="text-xl sm:text-2xl font-black text-slate-900">₹{(editUnits * editingItem.price).toLocaleString('en-IN')}</span>
+                </div>
 
                 <div className="flex gap-3">
                   <button
                     onClick={() => setEditingItem(null)}
-                    className="flex-1 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:bg-slate-50"
+                    className="flex-1 py-4 rounded-2xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
                   >
-                    Cancel
+                    Back
                   </button>
                   <button
                     onClick={handleUpdateUnits}
-                    className="flex-1 py-3 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700"
+                    className="flex-1 py-4 rounded-2xl font-black bg-blue-600 text-white shadow-lg shadow-blue-100 hover:bg-blue-700 transition active:scale-95"
                   >
                     Update
                   </button>
@@ -714,31 +784,34 @@ const StockSelection: React.FC = () => {
                 className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
                 onClick={e => e.stopPropagation()}
               >
-                <div className="p-4 border-b border-slate-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-slate-900">Add Stock to Basket</h3>
-                    <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-100 rounded-lg">
-                      <X className="w-5 h-5" />
+                <div className="p-4 sm:p-6 border-b border-slate-100">
+                  <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Explore Stocks</h3>
+                      <p className="text-xs sm:text-sm text-slate-500 font-medium">Add to your custom basket</p>
+                    </div>
+                    <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-50 rounded-xl transition">
+                      <X size={20} className="text-slate-400" />
                     </button>
                   </div>
 
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
-                        placeholder="Search stocks..."
+                        placeholder="Security name or symbol..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-sm font-medium"
                       />
                     </div>
                     <select
                       value={selectedSector}
                       onChange={e => setSelectedSector(e.target.value)}
-                      className="px-4 py-2 border border-slate-200 rounded-xl"
+                      className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition text-sm font-bold text-slate-700 appearance-none min-w-[140px]"
                     >
-                      {sectors.map(s => <option key={s} value={s}>{s}</option>)}
+                      {sectors.map(s => <option key={s} value={s}>{s === 'All' ? 'All Sectors' : s}</option>)}
                     </select>
                   </div>
                 </div>

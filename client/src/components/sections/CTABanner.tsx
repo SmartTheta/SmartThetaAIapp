@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react';
 
 export const CTABanner = () => {
     return (
-        <section className="py-20 px-6">
+        <section className="py-20 px-4 sm:px-6">
             <div className="max-w-7xl mx-auto">
                 <div className="relative overflow-hidden bg-blue-600 rounded-[3rem] px-8 py-16 md:px-16 md:py-24 text-center">
                     {/* Background Decorative Circles */}

@@ -173,37 +173,37 @@ export const OnboardingPortfolioPage = () => {
             setMode={setMode}
             showModeToggle={true}
         >
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto -mt-4 sm:mt-0">
                 {mode === 'ai' ? (
-                    <div className="h-[600px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col animate-in slide-in-from-bottom-4 duration-500">
+                    <div className="h-[calc(100vh-180px)] sm:h-[600px] bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col animate-in slide-in-from-bottom-4 duration-500">
                         {/* Chat Header */}
-                        <div className="bg-slate-900 p-4 flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/20">
-                                <Bot className="text-white" size={24} />
+                        <div className="bg-slate-900 p-3 sm:p-4 flex items-center gap-3 shrink-0">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/20">
+                                <Bot className="text-white w-5 h-5 sm:w-6 sm:h-6" />
                             </div>
                             <div>
-                                <h3 className="text-white font-bold text-sm">SmartTheta AI</h3>
+                                <h3 className="text-white font-bold text-xs sm:text-sm">SmartTheta AI</h3>
                                 <div className="flex items-center gap-1.5">
                                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                                    <span className="text-slate-400 text-[10px] uppercase font-black tracking-widest">Active Assistant</span>
+                                    <span className="text-slate-400 text-[9px] sm:text-[10px] uppercase font-black tracking-widest leading-none">Active Assistant</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Message Area */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-slate-50/50">
+                        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 custom-scrollbar bg-slate-50/50">
                             {messages.map((message, idx) => (
                                 <div key={idx} className={cn(
-                                    "flex items-start gap-3",
+                                    "flex items-start gap-2 sm:gap-3",
                                     message.type === 'user' ? "flex-row-reverse" : "flex-row"
                                 )}>
                                     {message.type === 'ai' && (
-                                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 shadow-sm">
-                                            <Bot className="text-white" size={16} />
+                                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 shadow-sm mt-1">
+                                            <Bot className="text-white w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         </div>
                                     )}
                                     <div className={cn(
-                                        "max-w-[80%] p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-sm border",
+                                        "max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-2xl text-[13px] sm:text-sm font-medium leading-relaxed shadow-sm border",
                                         message.type === 'ai'
                                             ? "bg-white border-slate-100 rounded-tl-none text-slate-800"
                                             : "bg-blue-600 border-blue-500 rounded-tr-none text-white"
@@ -217,9 +217,9 @@ export const OnboardingPortfolioPage = () => {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 bg-white border-t border-slate-100">
+                        <div className="p-3 sm:p-4 bg-white border-t border-slate-100 shrink-0">
                             <div className="flex items-center gap-2">
-                                <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+                                <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors hidden xs:block">
                                     <Paperclip size={20} />
                                 </button>
                                 <div className="flex-1 relative">
@@ -229,13 +229,13 @@ export const OnboardingPortfolioPage = () => {
                                         onChange={(e) => setInputValue(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                                         placeholder="Type your response..."
-                                        className="w-full pl-4 pr-12 py-3 bg-slate-100 border border-transparent focus:border-blue-200 focus:bg-white rounded-xl text-sm font-bold transition-all outline-none"
+                                        className="w-full pl-4 pr-10 py-2.5 sm:py-3 bg-slate-100 border border-transparent focus:border-blue-200 focus:bg-white rounded-xl text-[13px] sm:text-sm font-bold transition-all outline-none"
                                     />
                                     <button
                                         onClick={handleSend}
                                         className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:scale-110 transition-transform"
                                     >
-                                        <Send size={18} />
+                                        <Send className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
                                     </button>
                                 </div>
                                 <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
@@ -246,24 +246,24 @@ export const OnboardingPortfolioPage = () => {
                     </div>
                 ) : (
                     <div className="animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 space-y-8">
+                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200 p-5 sm:p-8 space-y-6 sm:space-y-8">
                             <div>
-                                <label className="block text-lg font-bold text-slate-900 mb-4">How much do you want to invest?</label>
+                                <label className="block text-base sm:text-lg font-bold text-slate-900 mb-3 sm:mb-4">How much do you want to invest?</label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-slate-400">₹</span>
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl sm:text-2xl font-bold text-slate-400">₹</span>
                                     <input
                                         type="text"
                                         value={investmentAmount}
                                         onChange={(e) => setInvestmentAmount(e.target.value.replace(/[^0-9]/g, ''))}
                                         placeholder="Enter amount (e.g., 50000)"
-                                        className="w-full pl-10 pr-6 py-5 bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-2xl text-2xl font-black transition-all outline-none"
+                                        className="w-full pl-10 pr-6 py-4 sm:py-5 bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white rounded-xl sm:rounded-2xl text-xl sm:text-2xl font-black transition-all outline-none"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-lg font-bold text-slate-900 mb-4">How do you want to invest?</label>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <label className="block text-base sm:text-lg font-bold text-slate-900 mb-3 sm:mb-4">How do you want to invest?</label>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                                     {[
                                         { id: 'sip', title: 'SIP', desc: 'Monthly investments', icon: Repeat },
                                         { id: 'lumpsum', title: 'Lumpsum', desc: 'One-time payment', icon: TrendingUp },
@@ -272,42 +272,42 @@ export const OnboardingPortfolioPage = () => {
                                         <button
                                             key={type.id}
                                             onClick={() => setInvestmentType(type.id as any)}
-                                            className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 ${investmentType === type.id
+                                            className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 transition-all text-left flex items-center sm:flex-col gap-3 sm:gap-3 ${investmentType === type.id
                                                 ? 'border-blue-600 bg-blue-50'
                                                 : 'border-slate-100 bg-slate-50 hover:border-slate-200'
                                                 }`}
                                         >
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${investmentType === type.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-400'
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${investmentType === type.id ? 'bg-blue-600 text-white' : 'bg-white text-slate-400'
                                                 }`}>
                                                 <type.icon size={20} />
                                             </div>
                                             <div>
-                                                <p className={`font-bold ${investmentType === type.id ? 'text-blue-600' : 'text-slate-900'}`}>{type.title}</p>
-                                                <p className="text-xs text-slate-500 font-medium">{type.desc}</p>
+                                                <p className={`font-bold text-sm sm:text-base ${investmentType === type.id ? 'text-blue-600' : 'text-slate-900'}`}>{type.title}</p>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 font-medium">{type.desc}</p>
                                             </div>
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="bg-amber-50 border border-amber-200 p-6 rounded-2xl flex items-start gap-4">
-                                <AlertCircle className="text-amber-600 shrink-0 mt-1" size={24} />
+                            <div className="bg-amber-50 border border-amber-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl flex items-start gap-3 sm:gap-4">
+                                <AlertCircle className="text-amber-600 shrink-0 mt-0.5 sm:mt-1 w-5 h-5 sm:w-6 sm:h-6" />
                                 <div>
-                                    <p className="text-lg font-bold text-amber-900">KYC Required (முக்கியமானது)</p>
-                                    <p className="text-slate-700 font-medium">Next step: Complete KYC + e-Mandate for automated investments</p>
+                                    <p className="text-sm sm:text-lg font-bold text-amber-900">KYC Required (முக்கியமானது)</p>
+                                    <p className="text-[11px] sm:text-sm text-slate-700 font-medium">Next step: Complete KYC + e-Mandate for automated investments</p>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleGenerate}
                                 disabled={!investmentAmount || !investmentType}
-                                className={`w-full py-5 rounded-2xl font-black text-xl transition-all shadow-xl ${investmentAmount && investmentType
+                                className={`w-full py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black text-lg sm:text-xl transition-all shadow-xl active:scale-[0.98] ${investmentAmount && investmentType
                                     ? 'bg-blue-600 text-white shadow-blue-100 hover:bg-blue-700'
                                     : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                                     }`}
                             >
                                 <div className="flex items-center justify-center gap-2">
-                                    <Sparkles size={24} />
+                                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
                                     Generate AI Portfolio
                                 </div>
                             </button>

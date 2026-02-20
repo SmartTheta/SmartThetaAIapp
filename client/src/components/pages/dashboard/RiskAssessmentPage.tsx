@@ -433,12 +433,12 @@ export const RiskAssessmentPage = () => {
 
 
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto px-1 lg:px-0">
             {/* Header Area */}
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-2 gap-3">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-3 px-3 lg:px-0">
                 <div>
-                    <h1 className="text-xl font-black text-slate-900 tracking-tight">Welcome, Sri!</h1>
-                    <p className="text-[13px] text-slate-500 font-medium">Let's get started with your <span className="text-blue-600 font-bold">Risk Assessment</span> for your Personalized Investment strategy.</p>
+                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Welcome, Sri!</h1>
+                    <p className="text-[12px] md:text-[13px] text-slate-500 font-medium">Let's get started with your <span className="text-blue-600 font-bold">Risk Assessment</span> for your Personalized Investment strategy.</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -447,26 +447,26 @@ export const RiskAssessmentPage = () => {
             </div>
 
             {/* Content Area */}
-            <div className="bg-white rounded-[1.5rem] p-4 lg:p-6 shadow-xl shadow-slate-200/40 border border-slate-100 flex flex-col min-h-[400px]">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 gap-3">
+            <div className="bg-white rounded-[1.5rem] p-4 lg:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 flex flex-col min-h-[500px] lg:min-h-[400px]">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-6">
                     <div>
-                        <h2 className="text-lg font-extrabold text-slate-900 mb-0.5">Risk Assessment</h2>
+                        <h2 className="text-lg md:text-xl font-extrabold text-slate-900 mb-1">Risk Assessment</h2>
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest">Question {answeredCount + 1} of 20</span>
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Question {answeredCount + 1} of 20</span>
                             <span className="w-1 h-1 rounded-full bg-slate-300" />
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">~ 5 mins</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">~ 5 mins</span>
                         </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
                         {sectionsData.map((s, idx) => (
                             <div key={idx} className={cn(
-                                "px-6 py-4 rounded-2xl border transition-all flex flex-col gap-2 min-w-[140px]",
+                                "px-4 py-3 sm:px-6 sm:py-4 rounded-2xl border transition-all flex flex-col gap-2 min-w-[130px] sm:min-w-[140px] flex-1 lg:flex-none",
                                 currentSection === idx ? "border-blue-200 bg-blue-50/50 shadow-sm shadow-blue-100/50" : "border-slate-100"
                             )}>
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.name.split(' ')[1]}</span>
-                                    <span className={cn("text-xs font-black", currentSection === idx ? "text-blue-600" : "text-slate-400")}>{s.count}/{s.total}</span>
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.name.split(' ')[1]}</span>
+                                    <span className={cn("text-[11px] sm:text-xs font-black", currentSection === idx ? "text-blue-600" : "text-slate-400")}>{s.count}/{s.total}</span>
                                 </div>
                                 <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                     <div className="h-full bg-blue-600 transition-all duration-500" style={{ width: `${(s.count / s.total) * 100}%` }} />
@@ -476,12 +476,12 @@ export const RiskAssessmentPage = () => {
                     </div>
                 </div>
 
-                <div className="flex-grow pb-1 text-left">
-                    <h3 className="text-[17px] font-bold text-slate-900 mb-3 leading-tight max-w-3xl border-l-[3px] border-blue-600 pl-3 animate-in slide-in-from-left duration-500">
+                <div className="flex-grow pb-4 text-left">
+                    <h3 className="text-[16px] md:text-[18px] lg:text-[20px] font-bold text-slate-900 mb-6 leading-tight max-w-3xl border-l-[4px] border-blue-600 pl-4 animate-in slide-in-from-left duration-500">
                         {currentQuestion?.text}
                     </h3>
 
-                    <div className="grid grid-cols-1 gap-2.5">
+                    <div className="grid grid-cols-1 gap-3">
                         {currentQuestion?.options.map((opt) => {
                             const qId = currentQuestion.id;
                             const isSelected = answers[qId] === opt.value;
@@ -491,26 +491,26 @@ export const RiskAssessmentPage = () => {
                                     onClick={() => handleAnswer(qId, opt.value)}
                                     disabled={isTransitioning}
                                     className={cn(
-                                        "w-full text-left p-2.5 rounded-lg border-2 transition-all flex items-center justify-between group",
+                                        "w-full text-left p-3 md:p-4 rounded-xl border-2 transition-all flex items-center justify-between group h-auto min-h-[60px]",
                                         isSelected
-                                            ? "border-blue-600 bg-blue-50 shadow-sm translate-x-1"
+                                            ? "border-blue-600 bg-blue-50 shadow-md translate-x-1"
                                             : "border-slate-100 hover:border-slate-200 hover:bg-slate-50",
                                         isTransitioning && "opacity-75 cursor-not-allowed"
                                     )}
                                 >
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-4">
                                         <div className={cn(
-                                            "w-7 h-7 rounded flex items-center justify-center transition-all",
+                                            "w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center transition-all shrink-0",
                                             isSelected ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
                                         )}>
-                                            <span className="text-xs font-bold">{opt.value}</span>
+                                            <span className="text-sm font-bold">{opt.value}</span>
                                         </div>
-                                        <span className={cn("text-[13px] font-bold leading-tight", isSelected ? "text-blue-900" : "text-slate-600")}>
+                                        <span className={cn("text-sm md:text-base font-bold leading-snug", isSelected ? "text-blue-900" : "text-slate-600")}>
                                             {opt.text}
                                         </span>
                                     </div>
                                     {isSelected && (
-                                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg animate-in zoom-in duration-300">
+                                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg animate-in zoom-in duration-300 shrink-0 ml-2">
                                             <CheckCircle size={20} />
                                         </div>
                                     )}
@@ -520,13 +520,13 @@ export const RiskAssessmentPage = () => {
                     </div>
                 </div>
 
-                <div className="sticky bottom-0 mt-auto flex items-center justify-between pt-4 pb-0 bg-white border-t border-slate-50 z-10">
+                <div className="sticky bottom-0 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 py-4 sm:py-6 bg-white border-t border-slate-50 z-10">
                     <div className="flex items-center gap-3 text-slate-400">
                         <TrendingUp className="w-4 h-4 shrink-0" />
-                        <span className="text-[12px] font-medium italic">Answer naturally for accurate AI allocation.</span>
+                        <span className="text-[11px] md:text-[12px] font-medium italic">Answer naturally for accurate AI allocation.</span>
                     </div>
 
-                    <div className="flex gap-4 shrink-0">
+                    <div className="flex gap-3 w-full sm:w-auto shrink-0">
                         {(currentSection > 0 || currentQuestionIdx > 0) && (
                             <button
                                 onClick={() => {
@@ -540,7 +540,7 @@ export const RiskAssessmentPage = () => {
                                     }
                                 }}
                                 disabled={isTransitioning}
-                                className="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-[13px] whitespace-nowrap disabled:opacity-50"
+                                className="flex-1 sm:flex-none px-6 py-3.5 bg-white border-2 border-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm disabled:opacity-50"
                             >
                                 Back
                             </button>
@@ -549,7 +549,7 @@ export const RiskAssessmentPage = () => {
                             <button
                                 onClick={() => setCurrentQuestionIdx(prev => prev + 1)}
                                 disabled={!answers[currentQuestion.id] || isTransitioning}
-                                className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 group disabled:opacity-50 text-[13px] whitespace-nowrap"
+                                className="flex-1 sm:flex-none px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group disabled:opacity-50 text-sm"
                             >
                                 Next Question
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -561,7 +561,7 @@ export const RiskAssessmentPage = () => {
                                     setCurrentQuestionIdx(0);
                                 }}
                                 disabled={!answers[currentQuestion.id] || isTransitioning}
-                                className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 group disabled:opacity-50 text-[13px] whitespace-nowrap"
+                                className="flex-1 sm:flex-none px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 group disabled:opacity-50 text-sm"
                             >
                                 Next Section
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -570,7 +570,7 @@ export const RiskAssessmentPage = () => {
                             <button
                                 onClick={handleSubmit}
                                 disabled={answeredCount < questions.length || isTransitioning}
-                                className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50 flex items-center gap-2 group text-[13px] whitespace-nowrap"
+                                className="flex-1 sm:flex-none px-8 py-3.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 flex items-center justify-center gap-2 group text-sm"
                             >
                                 Analyze Portfolio
                                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

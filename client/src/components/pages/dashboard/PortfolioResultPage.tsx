@@ -90,40 +90,65 @@ export const PortfolioResultPage = () => {
                     </div>
                 </div>
 
-                {/* Allocation Table */}
-                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-lg">
-                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                        <h3 className="font-bold text-lg text-slate-900">Recommended Allocation</h3>
-                        <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
-                            Total: <span className="text-slate-900">{formatCurrency(amount)}</span>
+                {/* Allocation Table / Cards */}
+                <div className="bg-white rounded-3xl border-2 border-slate-100 overflow-hidden shadow-sm">
+                    <div className="p-6 sm:p-8 border-b border-slate-100 flex items-center justify-between">
+                        <div>
+                            <h3 className="font-black text-lg sm:text-xl text-slate-900 leading-tight">Recommended Allocation</h3>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Asset distribution</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total Value</p>
+                            <p className="text-lg sm:text-xl font-black text-blue-600">{formatCurrency(amount)}</p>
                         </div>
                     </div>
-                    <div className="overflow-x-auto">
+
+                    {/* Mobile: Card View */}
+                    <div className="block sm:hidden p-4 space-y-3">
+                        {allocation.map((item, idx) => (
+                            <div key={idx} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-3 h-3 rounded-full ${item.color} shadow-sm`}></div>
+                                    <div>
+                                        <p className="font-black text-slate-900 text-sm leading-tight">{item.category}</p>
+                                        <p className="text-[11px] text-slate-500 font-medium">{item.asset}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-black text-slate-900">{item.percentage}%</p>
+                                    <p className="text-[10px] font-bold text-blue-600 uppercase mt-0.5">{formatCurrency((amount * item.percentage) / 100)}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Desktop: Table View */}
+                    <div className="hidden sm:block overflow-x-auto">
                         <table className="w-full">
                             <thead>
                                 <tr className="bg-slate-50/50">
-                                    <th className="text-left px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Category</th>
-                                    <th className="text-left px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Asset Name</th>
-                                    <th className="text-right px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Allocation %</th>
-                                    <th className="text-right px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
+                                    <th className="text-left px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Category</th>
+                                    <th className="text-left px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Asset Name</th>
+                                    <th className="text-right px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Allocation %</th>
+                                    <th className="text-right px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {allocation.map((item, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                                        <td className="px-6 py-4">
+                                    <tr key={idx} className="hover:bg-blue-50/30 transition-colors group">
+                                        <td className="px-8 py-5">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-2 h-2 rounded-full ${item.color}`}></div>
-                                                <span className="font-bold text-slate-900">{item.category}</span>
+                                                <div className={`w-3 h-3 rounded-full ${item.color} group-hover:scale-125 transition-transform`}></div>
+                                                <span className="font-black text-slate-900">{item.category}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className="text-slate-600 font-medium">{item.asset}</span>
+                                        <td className="px-8 py-5">
+                                            <span className="text-slate-600 font-bold">{item.asset}</span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <span className="text-slate-900 font-black">{item.percentage}%</span>
+                                        <td className="px-8 py-5 text-right">
+                                            <span className="text-slate-900 font-black text-lg">{item.percentage}%</span>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-black text-blue-600 whitespace-nowrap">
+                                        <td className="px-8 py-5 text-right font-black text-blue-600 text-lg">
                                             {formatCurrency((amount * item.percentage) / 100)}
                                         </td>
                                     </tr>

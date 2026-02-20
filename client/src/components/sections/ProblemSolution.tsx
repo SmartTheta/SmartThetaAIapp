@@ -10,7 +10,7 @@ import {
 
 export const ProblemSolution = () => {
     return (
-        <section id="features" className="py-16 px-6 lg:px-8 bg-slate-50 overflow-hidden">
+        <section id="features" className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 overflow-hidden">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-10">

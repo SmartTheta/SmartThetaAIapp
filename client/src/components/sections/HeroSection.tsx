@@ -20,7 +20,7 @@ export const HeroSection = () => {
 
     return (
         <section className="relative bg-[#ffffff] overflow-hidden">
-            <div className="max-w-[1440px] mx-auto px-12 pt-6 lg:pt-10 pb-8 lg:pb-12">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 pt-6 lg:pt-10 pb-8 lg:pb-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
                     {/* Left Column: Content */}
