@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OnboardingLayout } from '../../onboarding/layout/OnboardingLayout';
@@ -12,8 +12,11 @@ import {
   ArrowRight,
   ExternalLink,
   Info,
+  CheckCircle2,
 } from 'lucide-react';
 import { brokers, Broker, getRecommendedBrokers } from '../../../data/brokers';
+import ZerodhaConnectModal from '../../modals/ZerodhaConnectModal';
+import axios from 'axios';
 
 const BrokerSelection: React.FC = () => {
   const navigate = useNavigate();
@@ -21,7 +24,27 @@ const BrokerSelection: React.FC = () => {
   const [selectedType, setSelectedType] = useState<Broker['type'] | 'all'>('all');
   const [selectedBroker, setSelectedBroker] = useState<Broker | null>(null);
   const [showDDPIModal, setShowDDPIModal] = useState(false);
+  const [showZerodhaModal, setShowZerodhaModal] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [connectedBroker, setConnectedBroker] = useState<any>(null);
+
+  // Mock userId - In a real app, this comes from Auth Context/Store
+  const userId = localStorage.getItem('userId') || '67b45888e333ea2170d74999'; // Fallback for dev
+
+  useEffect(() => {
+    // Check if user already has a connected broker
+    const checkStatus = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/broker/status/${userId}`);
+        if (response.data.connected) {
+          setConnectedBroker(response.data);
+        }
+      } catch (err) {
+        console.error('Error checking broker status:', err);
+      }
+    };
+    checkStatus();
+  }, [userId]);
 
   const recommended = getRecommendedBrokers();
 
@@ -33,17 +56,27 @@ const BrokerSelection: React.FC = () => {
 
   const handleConnect = async (broker: Broker) => {
     setSelectedBroker(broker);
-    setShowDDPIModal(true);
+    if (broker.id === 'zerodha') {
+      setShowZerodhaModal(true);
+    } else {
+      setShowDDPIModal(true);
+    }
   };
 
   const handleConfirmDDPI = async () => {
     setIsConnecting(true);
-    // Simulate connection process
+    // Simulate connection process for other brokers
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsConnecting(false);
     setShowDDPIModal(false);
     // Navigate to order execution with broker info
     navigate('/dashboard/order-execution', { state: { broker: selectedBroker } });
+  };
+
+  const handleZerodhaSuccess = (brokerData: any) => {
+    setConnectedBroker(brokerData);
+    setShowZerodhaModal(false);
+    navigate('/dashboard/order-execution', { state: { broker: selectedBroker, brokerData } });
   };
 
   const typeLabels = {
@@ -54,9 +87,17 @@ const BrokerSelection: React.FC = () => {
   };
 
   const CustomHeader = (
-    <div>
-      <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Connect Broker</h1>
-      <p className="text-[10px] sm:text-xs text-slate-500 font-medium">Select from 20+ SEBI registered brokers</p>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3">
+      <div>
+        <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Connect Broker</h1>
+        <p className="text-[10px] sm:text-xs text-slate-500 font-medium">Select from 20+ SEBI registered brokers</p>
+      </div>
+      {connectedBroker && (
+        <div className="bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 flex items-center gap-2">
+          <CheckCircle2 size={14} className="text-green-600" />
+          <span className="text-xs font-bold text-green-700">Zerodha Connected ({connectedBroker.zerodhaUserId})</span>
+        </div>
+      )}
     </div>
   );
 
@@ -77,14 +118,20 @@ const BrokerSelection: React.FC = () => {
                   key={broker.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border-2 border-slate-100 rounded-2xl p-5 sm:p-6 hover:border-blue-500 hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden"
+                  className={`bg-white border-2 rounded-2xl p-5 sm:p-6 hover:border-blue-500 hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden ${connectedBroker && connectedBroker.broker === broker.id ? 'border-green-500 shadow-green-50' : 'border-slate-100'
+                    }`}
                   onClick={() => handleConnect(broker)}
                 >
-                  <div className="absolute top-0 right-0 p-3">
+                  <div className="absolute top-0 right-0 p-3 flex flex-col items-end gap-2">
                     <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
                       <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                       <span className="text-xs font-bold text-yellow-700">{broker.rating}</span>
                     </div>
+                    {connectedBroker && connectedBroker.broker === broker.id && (
+                      <div className="bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider">
+                        Active
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-4 mb-4">
@@ -112,8 +159,11 @@ const BrokerSelection: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <button className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold group-hover:bg-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-100 active:scale-95 text-sm sm:text-base">
-                    Connect Now
+                  <button className={`w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95 text-sm sm:text-base ${connectedBroker && connectedBroker.broker === broker.id
+                      ? 'bg-green-600 text-white shadow-green-100'
+                      : 'bg-slate-900 text-white group-hover:bg-blue-600 shadow-slate-100'
+                    }`}>
+                    {connectedBroker && connectedBroker.broker === broker.id ? 'Proceed with Broker' : 'Connect Now'}
                     <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                 </motion.div>
@@ -161,7 +211,8 @@ const BrokerSelection: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group"
+                  className={`bg-white border rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all cursor-pointer group ${connectedBroker && connectedBroker.broker === broker.id ? 'border-green-500' : 'border-slate-200 hover:border-blue-300'
+                    }`}
                   onClick={() => handleConnect(broker)}
                 >
                   <div className="flex items-center gap-3 mb-3">
@@ -172,7 +223,12 @@ const BrokerSelection: React.FC = () => {
                       {broker.name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-slate-900 text-sm sm:text-base truncate">{broker.name}</h3>
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="font-bold text-slate-900 text-sm sm:text-base truncate">{broker.name}</h3>
+                        {connectedBroker && connectedBroker.broker === broker.id && (
+                          <Check size={14} className="text-green-600 shrink-0" />
+                        )}
+                      </div>
                       <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold ${broker.type === 'discount' ? 'bg-green-100 text-green-700' :
                         broker.type === 'fullService' ? 'bg-purple-100 text-purple-700' :
                           'bg-blue-100 text-blue-700'
@@ -316,6 +372,13 @@ const BrokerSelection: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <ZerodhaConnectModal
+          isOpen={showZerodhaModal}
+          onClose={() => setShowZerodhaModal(false)}
+          onSuccess={handleZerodhaSuccess}
+          userId={userId}
+        />
       </div>
     </OnboardingLayout>
   );

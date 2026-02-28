@@ -1,7 +1,9 @@
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import * as speakeasy from 'speakeasy';
 import { parse as parseUrl } from 'url';
 import { Types } from 'mongoose';
+import { wrapper } from 'axios-cookiejar-support';
+import { CookieJar } from 'tough-cookie';
 import BrokerAccount, { IBrokerAccount } from '../models/BrokerAccount';
 
 // Use require for kiteconnect to avoid TS type conflicts
@@ -35,45 +37,18 @@ export interface OrderResult {
 
 /**
  * Performs automated Zerodha login using credentials + TOTP.
- * Mirrors the Python zerodha_auto_login_child() function exactly.
- *
- * Flow:
- *  1. POST /api/login → get request_id
- *  2. POST /api/twofa → authenticate with TOTP
- *  3. GET kite.trade/connect/login → follow redirect → extract request_token
- *  4. generateSession(request_token) → get access_token
  */
 export async function zerodhaAutoLogin(credentials: ZerodhaCredentials): Promise<LoginResult> {
-    // Create a session that persists cookies across requests (like Python requests.Session)
-    const cookieJar: Record<string, string> = {};
-
-    const session: AxiosInstance = axios.create({
+    const jar = new CookieJar();
+    const session = wrapper(axios.create({
+        jar,
+        withCredentials: true,
         maxRedirects: 10,
         timeout: 30000,
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         }
-    });
-
-    // Cookie interceptor to persist cookies between requests
-    session.interceptors.response.use(response => {
-        const setCookie = response.headers['set-cookie'];
-        if (setCookie) {
-            setCookie.forEach((cookie: string) => {
-                const [pair] = cookie.split(';');
-                const [key, val] = pair.split('=');
-                if (key && val) cookieJar[key.trim()] = val.trim();
-            });
-        }
-        return response;
-    });
-
-    session.interceptors.request.use(config => {
-        const cookieStr = Object.entries(cookieJar).map(([k, v]) => `${k}=${v}`).join('; ');
-        if (cookieStr) config.headers['Cookie'] = cookieStr;
-        return config;
-    });
+    }));
 
     try {
         // ── Step 1: Initial login ──────────────────────────────────────────
@@ -114,7 +89,8 @@ export async function zerodhaAutoLogin(credentials: ZerodhaCredentials): Promise
         }
 
         // ── Step 3: Get request_token from redirect ────────────────────────
-        const loginUrl = `https://kite.trade/connect/login?v=3&api_key=${credentials.apiKey}&skip_session=true`;
+        // Remove skip_session=true to use the session we just created
+        const loginUrl = `https://kite.trade/connect/login?v=3&api_key=${credentials.apiKey}`;
 
         let requestToken: string | null = null;
 
@@ -141,6 +117,9 @@ export async function zerodhaAutoLogin(credentials: ZerodhaCredentials): Promise
             const finalUrl: string =
                 (redirectResponse.request as any)?.res?.responseUrl ||
                 redirectResponse.headers?.location || '';
+
+            console.log('[ZerodhaService] Debug - Final URL:', finalUrl);
+
             const parsed = parseUrl(finalUrl, true);
             requestToken = parsed.query?.request_token as string || null;
         }
