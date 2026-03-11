@@ -1,6 +1,7 @@
 import express from 'express';
 import {
     connectBroker,
+    connectBrokerOAuth,
     getBrokerStatus,
     loginBroker,
     placeOrder,
@@ -10,8 +11,11 @@ import {
 
 const router = express.Router();
 
-// Connect broker (save credentials + test login)
+// Connect broker (save credentials + test login — headless)
 router.post('/connect', connectBroker);
+
+// Connect broker via OAuth (Kite Connect redirect flow)
+router.post('/connect-oauth', connectBrokerOAuth);
 
 // Get broker connection status for a user
 router.get('/status/:userId', getBrokerStatus);

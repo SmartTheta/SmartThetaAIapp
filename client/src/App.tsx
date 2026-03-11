@@ -22,9 +22,14 @@ import { KYCOnboardingPage } from './components/pages/dashboard/KYCOnboardingPag
 import { PortfolioResultPage } from './components/pages/dashboard/PortfolioResultPage';
 import { PortfolioBuilderPage } from './components/pages/dashboard/PortfolioBuilderPage';
 import { PortfolioDashboardPage } from './components/pages/dashboard/PortfolioDashboardPage';
-import StockSelection from './components/pages/dashboard/StockSelection';
+import { SmartBasketPage } from './components/pages/dashboard/SmartBasketPage';
 import BrokerSelection from './components/pages/dashboard/BrokerSelection';
 import OrderExecution from './components/pages/dashboard/OrderExecution';
+import { TierSelectionPage } from './components/pages/dashboard/TierSelectionPage';
+import { FreeTrialPage } from './components/pages/dashboard/FreeTrialPage';
+import { PaymentPage } from './components/pages/dashboard/PaymentPage';
+import { InvestmentSetupPage } from './components/pages/dashboard/InvestmentSetupPage';
+import { BrokerCallbackPage } from './components/pages/dashboard/BrokerCallbackPage';
 
 const VerifyEmail = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -99,6 +104,26 @@ function App() {
             <RiskProfilePage />
           </DashboardLayout>
         } />
+        <Route path="/dashboard/tier-selection" element={
+          <DashboardLayout>
+            <TierSelectionPage />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/free-trial" element={
+          <DashboardLayout>
+            <FreeTrialPage />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/payment" element={
+          <DashboardLayout>
+            <PaymentPage />
+          </DashboardLayout>
+        } />
+        <Route path="/dashboard/investment-setup" element={
+          <DashboardLayout>
+            <InvestmentSetupPage />
+          </DashboardLayout>
+        } />
         <Route path="/dashboard/pricing" element={
           <DashboardLayout>
             <PricingPage />
@@ -107,17 +132,22 @@ function App() {
         <Route path="/onboarding/portfolio" element={
           <OnboardingPortfolioPage />
         } />
-        <Route path="/onboarding/kyc" element={
+        <Route path="/dashboard/kyc-onboarding" element={
           <KYCOnboardingPage />
         } />
         <Route path="/dashboard/portfolio-result" element={
-          <PortfolioResultPage />
+          <DashboardLayout>
+            <PortfolioResultPage />
+          </DashboardLayout>
         } />
         <Route path="/dashboard/stock-selection" element={
-          <StockSelection />
+          <SmartBasketPage />
         } />
         <Route path="/dashboard/broker-selection" element={
           <BrokerSelection />
+        } />
+        <Route path="/dashboard/broker-callback" element={
+          <BrokerCallbackPage />
         } />
         <Route path="/dashboard/order-execution" element={
           <OrderExecution />

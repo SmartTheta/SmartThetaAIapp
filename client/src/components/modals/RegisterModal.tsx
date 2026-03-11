@@ -18,7 +18,7 @@ interface RegisterModalProps {
 export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onLoginClick }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
-        fullName: '', email: '', phone: '', password: '', confirmPassword: '', terms: false
+        fullName: '', dob: '', email: '', phone: '', password: '', confirmPassword: '', terms: false
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedLangId, setSelectedLangId] = useState('en');
@@ -31,6 +31,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
     const validate = (n: string, v: any) => {
         let e = '';
         if (n === 'fullName' && !v) e = 'Required';
+        if (n === 'dob' && !v) e = 'Required';
         if (n === 'email' && !/\S+@\S+\.\S+/.test(v)) e = 'Invalid email';
         if (n === 'phone' && !/^\d{10}$/.test(v)) e = '10 digits';
         if (n === 'password' && v.length < 8) e = 'Min 8 chars';

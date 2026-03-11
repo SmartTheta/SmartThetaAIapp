@@ -39,12 +39,14 @@ const brokerAccountSchema = new Schema<IBrokerAccount>({
     },
     zerodhaUserId: {
         type: String,
-        required: true,
+        required: false,
+        default: '',
         trim: true
     },
     password: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
     totpKey: {
         type: String,

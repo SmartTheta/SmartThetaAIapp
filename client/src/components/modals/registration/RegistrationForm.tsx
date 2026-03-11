@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react';
 import { labelStyle, inputStyle, primaryButtonStyle, checklistItemStyle } from './RegistrationData';
+
+const API = 'http://localhost:5000/api/auth';
 
 interface RegistrationFormProps {
     formData: any;
@@ -69,6 +72,10 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
     const [phoneVerified, setPhoneVerified] = useState(false);
     const [emailOtp, setEmailOtp] = useState('');
     const [phoneOtp, setPhoneOtp] = useState('');
+    const [emailOtpLoading, setEmailOtpLoading] = useState(false);
+    const [phoneOtpLoading, setPhoneOtpLoading] = useState(false);
+    const [emailOtpError, setEmailOtpError] = useState('');
+    const [phoneOtpError, setPhoneOtpError] = useState('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -76,7 +83,90 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
         setFormData({ ...formData, [name]: val });
     };
 
-    const isFormValid = formData.fullName && emailVerified && phoneVerified && formData.terms && !errors.confirmPassword && formData.password.length >= 8;
+    const handleSendEmailOtp = async () => {
+        if (!formData.email) return;
+        setEmailOtpLoading(true);
+        setEmailOtpError('');
+        try {
+            await axios.post(`${API}/send-otp`, { to: formData.email, channel: 'email' });
+            setEmailOtpSent(true);
+        } catch (err: any) {
+            setEmailOtpError(err.response?.data?.message || 'Failed to send OTP');
+        } finally {
+            setEmailOtpLoading(false);
+        }
+    };
+
+    const handleVerifyEmailOtp = async () => {
+        if (!emailOtp) return;
+        setEmailOtpLoading(true);
+        setEmailOtpError('');
+        try {
+            await axios.post(`${API}/verify-otp`, { to: formData.email, channel: 'email', code: emailOtp });
+            setEmailVerified(true);
+        } catch (err: any) {
+            setEmailOtpError(err.response?.data?.message || 'Invalid OTP');
+        } finally {
+            setEmailOtpLoading(false);
+        }
+    };
+
+    const handleSendPhoneOtp = async () => {
+        if (!formData.phone) return;
+        setPhoneOtpLoading(true);
+        setPhoneOtpError('');
+        try {
+            await axios.post(`${API}/send-otp`, { to: `+91${formData.phone}`, channel: 'sms' });
+            setPhoneOtpSent(true);
+        } catch (err: any) {
+            setPhoneOtpError(err.response?.data?.message || 'Failed to send OTP');
+        } finally {
+            setPhoneOtpLoading(false);
+        }
+    };
+
+    const handleVerifyPhoneOtp = async () => {
+        if (!phoneOtp) return;
+        setPhoneOtpLoading(true);
+        setPhoneOtpError('');
+        try {
+            await axios.post(`${API}/verify-otp`, { to: `+91${formData.phone}`, channel: 'sms', code: phoneOtp });
+            setPhoneVerified(true);
+        } catch (err: any) {
+            setPhoneOtpError(err.response?.data?.message || 'Invalid OTP');
+        } finally {
+            setPhoneOtpLoading(false);
+        }
+    };
+
+    const [registerLoading, setRegisterLoading] = useState(false);
+    const [registerError, setRegisterError] = useState('');
+
+    const isFormValid = formData.fullName && formData.dob && emailVerified && phoneVerified && formData.terms && !errors.confirmPassword && formData.password.length >= 8;
+
+    const handleRegister = async () => {
+        if (!isFormValid) return;
+        setRegisterLoading(true);
+        setRegisterError('');
+        try {
+            const res = await axios.post(`${API}/register`, {
+                fullName: formData.fullName,
+                dob: formData.dob,
+                email: formData.email,
+                phone: `+91${formData.phone}`,
+                password: formData.password,
+                agreedToTerms: formData.terms,
+            });
+            // Save user info for risk calculator
+            localStorage.setItem('userId', res.data.user.id);
+            localStorage.setItem('userDob', formData.dob);
+            localStorage.setItem('userName', formData.fullName);
+            window.location.href = '/dashboard/risk-assessment';
+        } catch (err: any) {
+            setRegisterError(err.response?.data?.message || 'Registration failed. Please try again.');
+            setRegisterLoading(false);
+        }
+    };
 
     return (
         <div className="space-y-3 text-left">
@@ -93,6 +183,24 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             </div>
 
             <div>
+                <label className={labelStyle}>Date of Birth</label>
+                <input
+                    type="date"
+                    name="dob"
+                    value={formData.dob}
+                    onChange={handleChange}
+                    onBlur={e => validate('dob', e.target.value)}
+                    max={new Date().toISOString().split('T')[0]}
+                    className={inputStyle(!!errors.dob)}
+                />
+                <p className="text-amber-600 text-[10px] mt-1 flex items-center gap-1">
+                    <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.168 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>
+                    Your DOB will be used to calculate your risk score. Please enter the correct date.
+                </p>
+                {errors.dob && <p className="text-red-500 text-[10px] mt-1">{errors.dob}</p>}
+            </div>
+
+            <div>
                 <label className={labelStyle}>Email Address</label>
                 <div className="flex gap-1.5">
                     <input
@@ -105,13 +213,15 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     />
                     {!emailVerified && (
                         <button
-                            onClick={() => setEmailOtpSent(true)}
-                            className="h-12 px-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-100 transition-colors shrink-0"
+                            onClick={handleSendEmailOtp}
+                            disabled={emailOtpLoading || !formData.email}
+                            className="h-12 px-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-100 transition-colors shrink-0 disabled:opacity-50"
                         >
-                            {emailOtpSent ? 'Resend' : 'Verify'}
+                            {emailOtpLoading ? '...' : emailOtpSent ? 'Resend' : 'Verify'}
                         </button>
                     )}
                 </div>
+                {emailOtpError && <p className="text-red-500 text-[10px] mt-1">{emailOtpError}</p>}
                 {emailOtpSent && !emailVerified && (
                     <div className="mt-1.5 flex gap-1.5 animate-in slide-in-from-top-1">
                         <input
@@ -121,10 +231,11 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                             className="w-16 h-10 px-2 border border-blue-100 rounded-xl text-center text-xs font-bold outline-none focus:border-blue-500"
                         />
                         <button
-                            onClick={() => { if (emailOtp.length >= 4) setEmailVerified(true); }}
-                            className="flex-grow h-10 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase shadow-lg shadow-blue-100"
+                            onClick={handleVerifyEmailOtp}
+                            disabled={emailOtpLoading || emailOtp.length < 4}
+                            className="flex-grow h-10 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase shadow-lg shadow-blue-100 disabled:opacity-50"
                         >
-                            Confirm Email
+                            {emailOtpLoading ? '...' : 'Confirm Email'}
                         </button>
                     </div>
                 )}
@@ -151,13 +262,15 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     />
                     {!phoneVerified && (
                         <button
-                            onClick={() => setPhoneOtpSent(true)}
-                            className="h-12 px-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-100 transition-colors shrink-0"
+                            onClick={handleSendPhoneOtp}
+                            disabled={phoneOtpLoading || !formData.phone}
+                            className="h-12 px-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-100 transition-colors shrink-0 disabled:opacity-50"
                         >
-                            {phoneOtpSent ? 'Resend' : 'Verify'}
+                            {phoneOtpLoading ? '...' : phoneOtpSent ? 'Resend' : 'Verify'}
                         </button>
                     )}
                 </div>
+                {phoneOtpError && <p className="text-red-500 text-[10px] mt-1">{phoneOtpError}</p>}
                 {phoneOtpSent && !phoneVerified && (
                     <div className="mt-1.5 flex gap-1.5 animate-in slide-in-from-top-1">
                         <input
@@ -167,13 +280,15 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                             className="w-16 h-10 px-2 border border-blue-100 rounded-xl text-center text-xs font-bold outline-none focus:border-blue-500"
                         />
                         <button
-                            onClick={() => { if (phoneOtp.length >= 4) setPhoneVerified(true); }}
-                            className="flex-grow h-10 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase shadow-lg shadow-blue-100"
+                            onClick={handleVerifyPhoneOtp}
+                            disabled={phoneOtpLoading || phoneOtp.length < 4}
+                            className="flex-grow h-10 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase shadow-lg shadow-blue-100 disabled:opacity-50"
                         >
-                            Confirm Phone
+                            {phoneOtpLoading ? '...' : 'Confirm Phone'}
                         </button>
                     </div>
                 )}
+                {phoneVerified && <p className="text-green-600 text-[10px] mt-1">Phone verified</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -230,16 +345,13 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                 </label>
             </div>
 
+            {registerError && <p className="text-red-500 text-[11px] text-center">{registerError}</p>}
             <button
-                onClick={() => {
-                    if (isFormValid) {
-                        window.location.href = '/dashboard/risk-assessment';
-                    }
-                }}
-                disabled={!isFormValid}
+                onClick={handleRegister}
+                disabled={!isFormValid || registerLoading}
                 className={primaryButtonStyle}
             >
-                Create Account
+                {registerLoading ? 'Creating Account...' : 'Create Account'}
             </button>
         </div>
     );

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Download, ShieldCheck, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { OnboardingLayout } from '../../onboarding/layout/OnboardingLayout';
 import { RiskAssessmentResult } from './RiskAssessmentPage';
 
 export const PortfolioResultPage = () => {
+    const navigate = useNavigate();
     const [results, setResults] = useState<RiskAssessmentResult | null>(null);
     const [selection, setSelection] = useState<{ amount: string, type: string, mode: string } | null>(null);
     const [riskLevel, setRiskLevel] = useState<'moderate' | 'aggressive' | 'conservative'>('moderate');
@@ -190,10 +192,11 @@ export const PortfolioResultPage = () => {
 
                 {/* Action Button */}
                 <button
+                    onClick={() => navigate('/dashboard/stock-selection')}
                     className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                 >
                     <ShieldCheck size={26} />
-                    Execute Portfolio
+                    Proceed to Stock Selection
                 </button>
             </div>
         </OnboardingLayout>

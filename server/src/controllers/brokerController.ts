@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import BrokerAccount from '../models/BrokerAccount';
-import { zerodhaAutoLogin, getKiteForUser, placeStockOrder } from '../services/zerodhaService';
+import { zerodhaAutoLogin, getKiteForUser, placeStockOrder, exchangeRequestToken } from '../services/zerodhaService';
+import { encrypt } from '../utils/crypto';
 
 // ─── Save / Update Broker Credentials ────────────────────────────────────────
 
@@ -33,11 +34,11 @@ export const connectBroker = async (req: Request, res: Response) => {
             {
                 userId: new Types.ObjectId(userId),
                 broker: 'zerodha',
-                apiKey,
-                apiSecret,
+                apiKey: encrypt(apiKey),
+                apiSecret: encrypt(apiSecret),
                 zerodhaUserId,
-                password,
-                totpKey,
+                password: encrypt(password),
+                totpKey: encrypt(totpKey),
                 accessToken: loginResult.accessToken,
                 isLoggedIn: true,
                 lastLoginTime: new Date()
@@ -53,6 +54,65 @@ export const connectBroker = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error('Error connecting broker:', error);
+        return res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+};
+
+// ─── OAuth Connect (Kite Connect redirect flow) ─────────────────────────────
+
+/**
+ * POST /api/broker/connect-oauth
+ * Exchange a Kite Connect request_token for an access_token (OAuth flow).
+ * The user has already logged in on Zerodha's website and been redirected back.
+ */
+export const connectBrokerOAuth = async (req: Request, res: Response) => {
+    try {
+        const { userId, apiKey, apiSecret, totpKey, requestToken } = req.body;
+
+        if (!userId || !apiKey || !apiSecret || !totpKey || !requestToken) {
+            return res.status(400).json({ error: 'userId, apiKey, apiSecret, totpKey, and requestToken are required' });
+        }
+
+        // Exchange request_token for access_token
+        const result = await exchangeRequestToken(apiKey, apiSecret, requestToken);
+
+        if (!result.success || !result.accessToken) {
+            return res.status(401).json({
+                error: 'Token exchange failed',
+                details: result.error
+            });
+        }
+
+        // Upsert broker account in MongoDB (no password stored in OAuth flow)
+        const brokerAccount = await BrokerAccount.findOneAndUpdate(
+            { userId: new Types.ObjectId(userId) },
+            {
+                userId: new Types.ObjectId(userId),
+                broker: 'zerodha',
+                apiKey: encrypt(apiKey),
+                apiSecret: encrypt(apiSecret),
+                zerodhaUserId: result.zerodhaUserId || '',
+                password: '',  // Not stored in OAuth flow
+                totpKey: encrypt(totpKey),
+                accessToken: result.accessToken,
+                isLoggedIn: true,
+                lastLoginTime: new Date()
+            },
+            { upsert: true, new: true }
+        );
+
+        return res.json({
+            success: true,
+            message: 'Zerodha account connected via OAuth',
+            broker: {
+                ...brokerAccount.toJSON(),
+                zerodhaUserId: result.zerodhaUserId,
+                userName: result.userName
+            }
+        });
+
+    } catch (error: any) {
+        console.error('Error connecting broker via OAuth:', error);
         return res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 };

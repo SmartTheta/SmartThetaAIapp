@@ -1,19 +1,16 @@
 import { Request, Response } from 'express';
-import { sendOtp, verifyOtp } from '../services/twilioService';
-import User from '../models/User';
 import bcrypt from 'bcrypt';
+import { sendOtp, verifyOtp } from '../services/otpService';
+import User from '../models/User';
 
-const MAX_ATTEMPTS = 3;
+// ─── Check if email exists ────────────────────────────────────────────────────
 
-/**
- * Check if email already exists
- */
 export const checkEmailExists = async (req: Request, res: Response) => {
     const { email } = req.body;
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists' });
+        const existing = await User.findOne({ email });
+        if (existing) {
+            return res.status(400).json({ message: 'Email already registered' });
         }
         res.status(200).json({ message: 'Email is available' });
     } catch (error: any) {
@@ -21,14 +18,13 @@ export const checkEmailExists = async (req: Request, res: Response) => {
     }
 };
 
-/**
- * Check if phone already exists
- */
+// ─── Check if phone exists ────────────────────────────────────────────────────
+
 export const checkPhoneExists = async (req: Request, res: Response) => {
     const { phone } = req.body;
     try {
-        const existingUser = await User.findOne({ phone });
-        if (existingUser) {
+        const existing = await User.findOne({ phone });
+        if (existing) {
             return res.status(400).json({ message: 'Phone number already registered' });
         }
         res.status(200).json({ message: 'Phone number is available' });
@@ -37,85 +33,93 @@ export const checkPhoneExists = async (req: Request, res: Response) => {
     }
 };
 
-/**
- * Send OTP via Twilio
- */
-export const sendVerificationOtp = async (req: Request, res: Response) => {
-    const { to, channel } = req.body; // channel is 'sms' or 'email'
+// ─── Send OTP ─────────────────────────────────────────────────────────────────
+// Body: { to: string, channel: 'email' | 'sms' }
 
-    if (!to || !channel) {
-        return res.status(400).json({ message: 'Recipient and channel are required' });
+export const sendVerificationOtp = async (req: Request, res: Response) => {
+    const { to, channel } = req.body;
+
+    if (!to || !channel || !['email', 'sms'].includes(channel)) {
+        return res.status(400).json({ message: 'to and channel (email | sms) are required' });
     }
 
     try {
-        await sendOtp(to, channel);
+        await sendOtp(to, channel as 'email' | 'sms');
         res.status(200).json({ message: `OTP sent to ${to} via ${channel}` });
     } catch (error: any) {
+        console.error('[sendVerificationOtp]', error.message);
         res.status(500).json({ message: 'Failed to send OTP', error: error.message });
     }
 };
 
-/**
- * Verify OTP via Twilio
- */
-export const verifyVerificationOtp = async (req: Request, res: Response) => {
-    const { to, code } = req.body;
+// ─── Verify OTP ───────────────────────────────────────────────────────────────
+// Body: { to: string, channel: 'email' | 'sms', code: string }
 
-    if (!to || !code) {
-        return res.status(400).json({ message: 'Recipient and code are required' });
+export const verifyVerificationOtp = async (req: Request, res: Response) => {
+    const { to, channel, code } = req.body;
+
+    if (!to || !channel || !code) {
+        return res.status(400).json({ message: 'to, channel and code are required' });
     }
 
     try {
-        const verification = await verifyOtp(to, code);
+        const result = await verifyOtp(to, channel as 'email' | 'sms', code);
 
-        if (verification.status === 'approved') {
-            res.status(200).json({ message: 'Verification successful' });
-        } else {
-            res.status(400).json({ message: 'Invalid OTP' });
+        if (result.status === 'approved') {
+            return res.status(200).json({ message: 'OTP verified successfully' });
         }
+
+        const messages: Record<string, string> = {
+            expired:      'OTP has expired. Please request a new one.',
+            invalid:      'Invalid OTP. Please try again.',
+            max_attempts: 'Too many failed attempts. Please request a new OTP.',
+        };
+
+        res.status(400).json({ message: messages[result.status] || 'Verification failed' });
     } catch (error: any) {
+        console.error('[verifyVerificationOtp]', error.message);
         res.status(500).json({ message: 'Verification failed', error: error.message });
     }
 };
 
-/**
- * Final registration
- */
+// ─── Register ─────────────────────────────────────────────────────────────────
+// Body: { fullName, email, phone, password, agreedToTerms }
+
 export const register = async (req: Request, res: Response) => {
-    const { fullName, email, phone, password, agreedToTerms } = req.body;
+    const { fullName, dob, email, phone, password, agreedToTerms } = req.body;
+
+    if (!fullName || !dob || !email || !phone || !password || !agreedToTerms) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
 
     try {
-        // Double check existence
         const existingEmail = await User.findOne({ email });
-        if (existingEmail) return res.status(400).json({ message: 'Email already exists' });
+        if (existingEmail) return res.status(400).json({ message: 'Email already registered' });
 
         const existingPhone = await User.findOne({ phone });
         if (existingPhone) return res.status(400).json({ message: 'Phone already registered' });
 
-        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({
+        const user = new User({
             fullName,
+            dob: new Date(dob),
             email,
             phone,
             password: hashedPassword,
             agreedToTerms,
-            isVerified: true // Assuming they passed all OTP steps before calling this
+            isVerified: true,
         });
 
-        await newUser.save();
+        await user.save();
 
         res.status(201).json({
-            message: 'User registered successfully',
-            user: {
-                id: newUser._id,
-                fullName: newUser.fullName,
-                email: newUser.email
-            }
+            message: 'Registration successful',
+            user: { id: user._id, fullName: user.fullName, email: user.email },
         });
     } catch (error: any) {
+        console.error('[register]', error.message);
         res.status(500).json({ message: 'Registration failed', error: error.message });
     }
 };

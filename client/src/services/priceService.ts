@@ -1,9 +1,10 @@
 /**
- * Live Price Service - Google Finance Integration
+ * Live Price Service - Alpha Vantage Integration (via Backend)
  *
- * Fetches real-time stock prices from Google Finance for NSE/BSE stocks.
- * Uses a CORS proxy for browser compatibility.
+ * Fetches real-time stock prices from Alpha Vantage through our own server API.
  */
+
+import axios from 'axios';
 
 export interface LivePrice {
   symbol: string;
@@ -15,15 +16,14 @@ export interface LivePrice {
   error?: string;
 }
 
-// CORS proxy for browser requests
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // Cache to avoid repeated requests
 const priceCache: Map<string, { price: LivePrice; timestamp: number }> = new Map();
 const CACHE_DURATION = 60000; // 1 minute cache
 
 /**
- * Fetch live price from Google Finance
+ * Fetch live price from Alpha Vantage via our Backend
  */
 export async function fetchLivePrice(symbol: string, exchange: 'NSE' | 'BSE' = 'NSE'): Promise<LivePrice> {
   const cacheKey = `${symbol}:${exchange}`;
@@ -35,58 +35,17 @@ export async function fetchLivePrice(symbol: string, exchange: 'NSE' | 'BSE' = '
   }
 
   try {
-    const googleSymbol = `${symbol}:${exchange}`;
-    const url = `https://www.google.com/finance/quote/${googleSymbol}`;
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(url)}`;
+    // We send the symbol as is (e.g. RELIANCE.NSE) to the backend
+    const response = await axios.get(`${API_BASE_URL}/stocks/${symbol}/price`);
 
-    const response = await fetch(proxyUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const html = await response.text();
-
-    // Parse price from Google Finance HTML
-    // Look for the main price which is in a specific data attribute pattern
-    const priceMatch = html.match(/data-last-price="([0-9.]+)"/);
-    const changeMatch = html.match(/data-price-change="([+-]?[0-9.]+)"/);
-    const changePercentMatch = html.match(/data-price-change-percent="([+-]?[0-9.]+)"/);
-
-    // Alternative parsing - look for the price in the page content
-    let price = 0;
-    let change = 0;
-    let changePercent = 0;
-
-    if (priceMatch) {
-      price = parseFloat(priceMatch[1]);
-    } else {
-      // Fallback: Look for price pattern in the HTML
-      // Google Finance shows price like "₹1,234.56" or in JSON-like structures
-      const altPriceMatch = html.match(/class="YMlKec fxKbKc"[^>]*>([^<]+)</);
-      if (altPriceMatch) {
-        const priceStr = altPriceMatch[1].replace(/[₹,\s]/g, '');
-        price = parseFloat(priceStr);
-      }
-    }
-
-    if (changeMatch) {
-      change = parseFloat(changeMatch[1]);
-    }
-    if (changePercentMatch) {
-      changePercent = parseFloat(changePercentMatch[1]);
-    }
-
-    if (price === 0 || isNaN(price)) {
-      throw new Error('Could not parse price');
-    }
+    const data = response.data;
 
     const livePrice: LivePrice = {
-      symbol,
-      price,
-      change,
-      changePercent,
-      lastUpdated: new Date().toISOString(),
+      symbol: data.symbol,
+      price: data.price,
+      change: data.change,
+      changePercent: data.changePercent,
+      lastUpdated: data.lastUpdated,
       exchange
     };
 
@@ -95,8 +54,10 @@ export async function fetchLivePrice(symbol: string, exchange: 'NSE' | 'BSE' = '
 
     return livePrice;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Error fetching price for ${symbol}:`, error);
+
+    // If it's a rate limit or other error, return a placeholder or 0
     return {
       symbol,
       price: 0,
@@ -104,7 +65,7 @@ export async function fetchLivePrice(symbol: string, exchange: 'NSE' | 'BSE' = '
       changePercent: 0,
       lastUpdated: new Date().toISOString(),
       exchange,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error.response?.data?.error || error.message || 'Unknown error'
     };
   }
 }
@@ -115,11 +76,10 @@ export async function fetchLivePrice(symbol: string, exchange: 'NSE' | 'BSE' = '
 export async function fetchMultiplePrices(
   symbols: string[],
   exchange: 'NSE' | 'BSE' = 'NSE',
-  batchSize: number = 5
+  batchSize: number = 2 // Small batch size for Alpha Vantage free tier limits
 ): Promise<Map<string, LivePrice>> {
   const results = new Map<string, LivePrice>();
 
-  // Process in batches to avoid rate limiting
   for (let i = 0; i < symbols.length; i += batchSize) {
     const batch = symbols.slice(i, i + batchSize);
     const promises = batch.map(symbol => fetchLivePrice(symbol, exchange));
@@ -129,9 +89,9 @@ export async function fetchMultiplePrices(
       results.set(result.symbol, result);
     });
 
-    // Small delay between batches
+    // Substantial delay between batches to respect Alpha Vantage's 5 requests/min free limit
     if (i + batchSize < symbols.length) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 15000)); // 15s wait
     }
   }
 

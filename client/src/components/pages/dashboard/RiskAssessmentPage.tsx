@@ -1,15 +1,54 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { Bot, ChevronRight, TrendingUp, Shield, CheckCircle } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+
+const API = 'http://localhost:5000/api/risk-profile';
+
+const RISK_CATEGORIES = [
+    { category: 1, name: 'Ultra Conservative', min: 0, max: 10, equity: '5%', debt: '85%', gold: '10%' },
+    { category: 2, name: 'Capital Preservation', min: 11, max: 20, equity: '15%', debt: '75%', gold: '10%' },
+    { category: 3, name: 'Conservative', min: 21, max: 30, equity: '25%', debt: '65%', gold: '10%' },
+    { category: 4, name: 'Moderately Conservative', min: 31, max: 40, equity: '35%', debt: '55%', gold: '10%' },
+    { category: 5, name: 'Moderate', min: 41, max: 50, equity: '45%', debt: '45%', gold: '10%' },
+    { category: 6, name: 'Moderately Aggressive', min: 51, max: 60, equity: '55%', debt: '35%', gold: '10%' },
+    { category: 7, name: 'Growth', min: 61, max: 70, equity: '65%', debt: '25%', gold: '10%' },
+    { category: 8, name: 'Aggressive Growth', min: 71, max: 80, equity: '75%', debt: '18%', gold: '7%' },
+    { category: 9, name: 'High Growth', min: 81, max: 90, equity: '85%', debt: '10%', gold: '5%' },
+    { category: 10, name: 'Maximum Growth', min: 91, max: 100, equity: '95%', debt: '3%', gold: '2%' },
+];
+
+function calculateAgeFactor(age: number): number {
+    if (age < 25) return 1.00;
+    if (age < 30) return 0.95;
+    if (age < 35) return 0.90;
+    if (age < 40) return 0.85;
+    if (age < 45) return 0.78;
+    if (age < 50) return 0.70;
+    if (age < 55) return 0.62;
+    if (age < 60) return 0.52;
+    if (age < 65) return 0.42;
+    return 0.35;
+}
+
+function getCategoryFromScore(score: number) {
+    const clamped = Math.max(0, Math.min(100, Math.round(score)));
+    for (const cat of RISK_CATEGORIES) {
+        if (clamped >= cat.min && clamped <= cat.max) return cat;
+    }
+    return RISK_CATEGORIES[0];
+}
 
 export interface RiskAssessmentResult {
     riskCapacity: number;
     riskTolerance: number;
     behavioralBias: number;
-    finalScore: number;
-    tier: number;
-    tierName: string;
-    tierDescription: string;
+    age: number;
+    ageFactor: number;
+    rawScore: number;
+    riskNumber: number;
+    category: number;
+    categoryName: string;
     allocation: {
         equity: string;
         debt: string;
@@ -41,8 +80,7 @@ export const RiskAssessmentPage = () => {
     const questions = [
         // SECTION 0: Risk Capacity (Questions 1-6)
         {
-            id: 'q1',
-            section: 0,
+            id: 'q1', section: 0,
             text: 'If you lost your income today, how long could you pay all your bills using your savings?',
             options: [
                 { value: 'A', score: 25, text: 'Less than 3 months' },
@@ -52,8 +90,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q2',
-            section: 0,
+            id: 'q2', section: 0,
             text: 'What percentage of your monthly income goes towards paying loans (home loan, car loan, personal loans)?',
             options: [
                 { value: 'A', score: 25, text: 'More than 50% of my income' },
@@ -63,8 +100,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q3',
-            section: 0,
+            id: 'q3', section: 0,
             text: 'Do you have adequate insurance for yourself and your family?',
             options: [
                 { value: 'A', score: 25, text: 'No life or health insurance' },
@@ -74,8 +110,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q4',
-            section: 0,
+            id: 'q4', section: 0,
             text: 'When will you need to use this money you\'re planning to invest?',
             options: [
                 { value: 'A', score: 25, text: 'Within 2 years' },
@@ -85,8 +120,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q5',
-            section: 0,
+            id: 'q5', section: 0,
             text: 'How stable is your main source of income?',
             options: [
                 { value: 'A', score: 25, text: 'Very uncertain (freelance/commission)' },
@@ -96,8 +130,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q6',
-            section: 0,
+            id: 'q6', section: 0,
             text: 'Do you expect any big expenses in the next 3 years (wedding, home, education)?',
             options: [
                 { value: 'A', score: 25, text: 'Yes, very soon (within 1 year)' },
@@ -109,8 +142,7 @@ export const RiskAssessmentPage = () => {
 
         // SECTION 1: Risk Tolerance (Questions 7-13)
         {
-            id: 'q7',
-            section: 1,
+            id: 'q7', section: 1,
             text: 'Imagine you invested ₹10 lakhs. Within 6 months, it drops to ₹7 lakhs. What would you do?',
             options: [
                 { value: 'A', score: 25, text: 'Panic and sell immediately' },
@@ -120,8 +152,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q8',
-            section: 1,
+            id: 'q8', section: 1,
             text: 'How much loss in your investment portfolio would cause you to lose sleep?',
             options: [
                 { value: 'A', score: 25, text: 'Any loss at all, even 5%' },
@@ -131,8 +162,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q9',
-            section: 1,
+            id: 'q9', section: 1,
             text: 'If you made a wrong investment decision and lost money, how long would you feel bad?',
             options: [
                 { value: 'A', score: 25, text: 'For months, I\'d keep thinking about it' },
@@ -142,8 +172,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q10',
-            section: 1,
+            id: 'q10', section: 1,
             text: 'How would you rate your understanding of investments and markets?',
             options: [
                 { value: 'A', score: 25, text: 'Beginner (FDs/Savings only)' },
@@ -153,8 +182,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q11',
-            section: 1,
+            id: 'q11', section: 1,
             text: 'Have you ever invested in equity mutual funds or stocks during a market crash?',
             options: [
                 { value: 'A', score: 25, text: 'No, only safe options (FD/PPF)' },
@@ -164,8 +192,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q12',
-            section: 1,
+            id: 'q12', section: 1,
             text: 'In general life, how comfortable are you with trying new experiences?',
             options: [
                 { value: 'A', score: 25, text: 'Prefer familiar routines, avoid change' },
@@ -175,8 +202,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q13',
-            section: 1,
+            id: 'q13', section: 1,
             text: 'When facing uncertain situations in life, how do you typically react?',
             options: [
                 { value: 'A', score: 25, text: 'Get very anxious and stressed' },
@@ -188,8 +214,7 @@ export const RiskAssessmentPage = () => {
 
         // SECTION 2: Behavioral Bias (Questions 14-22)
         {
-            id: 'q14',
-            section: 2,
+            id: 'q14', section: 2,
             text: 'How would you rate your ability to pick good investments?',
             options: [
                 { value: 'A', score: 25, text: 'No confidence; need expert guidance' },
@@ -199,8 +224,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q15',
-            section: 2,
+            id: 'q15', section: 2,
             text: 'A stock was ₹500, now ₹700. Friend says it\'s a buy. What do you think?',
             options: [
                 { value: 'A', score: 25, text: 'Too expensive; wait for ₹500' },
@@ -210,8 +234,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q16',
-            section: 2,
+            id: 'q16', section: 2,
             text: 'When researching an investment, which approach do you typically follow?',
             options: [
                 { value: 'A', score: 25, text: 'Look for info that confirms my belief' },
@@ -221,42 +244,38 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q17',
-            section: 2,
+            id: 'q17', section: 2,
             text: 'How much do recent news headlines affect your investment decisions?',
             options: [
-                { value: 'A', score: 25, text: 'A lot – often decide based on news' },
-                { value: 'B', score: 50, text: 'Quite a bit – events stay in mind' },
-                { value: 'C', score: 75, text: 'Somewhat – aware but try to ignore' },
-                { value: 'D', score: 100, text: 'Very little – focus on fundamentals' },
+                { value: 'A', score: 25, text: 'A lot \u2013 often decide based on news' },
+                { value: 'B', score: 50, text: 'Quite a bit \u2013 events stay in mind' },
+                { value: 'C', score: 75, text: 'Somewhat \u2013 aware but try to ignore' },
+                { value: 'D', score: 100, text: 'Very little \u2013 focus on fundamentals' },
             ],
         },
         {
-            id: 'q18',
-            section: 2,
+            id: 'q18', section: 2,
             text: 'Everyone you know is investing in a hot sector. What do you do?',
             options: [
-                { value: 'A', score: 25, text: 'Jump in quickly – must be good' },
+                { value: 'A', score: 25, text: 'Jump in quickly \u2013 must be good' },
                 { value: 'B', score: 50, text: 'Feel pressured but worried' },
                 { value: 'C', score: 75, text: 'Research independently before deciding' },
-                { value: 'D', score: 100, text: 'Often avoid – cautious when everyone buys' },
+                { value: 'D', score: 100, text: 'Often avoid \u2013 cautious when everyone buys' },
             ],
         },
         {
-            id: 'q19',
-            section: 2,
-            text: 'You have ₹5L savings and get ₹2L bonus. How do you invest the bonus?',
+            id: 'q19', section: 2,
+            text: 'You have \u20B95L savings and get \u20B92L bonus. How do you invest the bonus?',
             options: [
-                { value: 'A', score: 25, text: 'Treat differently – take more risk' },
-                { value: 'B', score: 50, text: 'Separate bucket – specific purpose' },
+                { value: 'A', score: 25, text: 'Treat differently \u2013 take more risk' },
+                { value: 'B', score: 50, text: 'Separate bucket \u2013 specific purpose' },
                 { value: 'C', score: 75, text: 'View separate initially but plan' },
-                { value: 'D', score: 100, text: 'See as ₹7L total, one strategy' },
+                { value: 'D', score: 100, text: 'See as \u20B97L total, one strategy' },
             ],
         },
         {
-            id: 'q20',
-            section: 2,
-            text: 'If your investments gain ₹50k vs losing ₹50k, which affects you more?',
+            id: 'q20', section: 2,
+            text: 'If your investments gain \u20B950k vs losing \u20B950k, which affects you more?',
             options: [
                 { value: 'A', score: 25, text: 'Loss affects me 3-4x more' },
                 { value: 'B', score: 50, text: 'Loss affects me 2x more' },
@@ -265,8 +284,7 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q21',
-            section: 2,
+            id: 'q21', section: 2,
             text: 'When your investment does well or poorly, what do you think?',
             options: [
                 { value: 'A', score: 25, text: 'Gains=Skill, Losses=Bad Luck' },
@@ -276,12 +294,11 @@ export const RiskAssessmentPage = () => {
             ],
         },
         {
-            id: 'q22',
-            section: 2,
+            id: 'q22', section: 2,
             text: 'Advisor suggests moving money for better long-term returns. How do you feel?',
             options: [
-                { value: 'A', score: 25, text: 'Very uncomfortable – keep as is' },
-                { value: 'B', score: 50, text: 'Hesitant – need convincing' },
+                { value: 'A', score: 25, text: 'Very uncomfortable \u2013 keep as is' },
+                { value: 'B', score: 50, text: 'Hesitant \u2013 need convincing' },
                 { value: 'C', score: 75, text: 'Open if reasoning makes sense' },
                 { value: 'D', score: 100, text: 'Comfortable with change' },
             ],
@@ -297,7 +314,6 @@ export const RiskAssessmentPage = () => {
             return option?.score || 0;
         };
 
-        // Calculate average score per section (0-100 scale)
         const categories = [0, 1, 2].map(sectionIdx => {
             const sectionQuestions = questions.filter(q => q.section === sectionIdx);
             const totalScore = sectionQuestions.reduce((sum, q) => sum + getScore(q.id), 0);
@@ -308,89 +324,76 @@ export const RiskAssessmentPage = () => {
         const riskTolerance = categories[1];
         const behavioralScore = categories[2];
 
-        // Weighted Score Strategy: 40% Capacity, 40% Tolerance, 20% Behavior (Rationality)
-        // High Score = High Risk Capacity/Tolerance/Rationality = Aggressive Profile
-        const finalScore = (riskCapacity * 0.4) + (riskTolerance * 0.4) + (behavioralScore * 0.2);
+        // Get age from localStorage (saved during registration)
+        const dobStr = localStorage.getItem('userDob');
+        let age = 30; // fallback
+        if (dobStr) {
+            const dob = new Date(dobStr);
+            const today = new Date();
+            age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+        }
+        const ageFactor = calculateAgeFactor(age);
 
-        // Determine constraining factor
+        // Constraint-based formula: MIN(RC, RT) x BBI_Multiplier x AgeFactor
+        const constrainedBase = Math.min(riskCapacity, riskTolerance);
+        const bbiMultiplier = 0.5 + (behavioralScore / 100) * 0.5;
+        const rawScore = constrainedBase * bbiMultiplier;
+        const riskNumber = Math.round(rawScore * ageFactor);
+
         const diff = Math.abs(riskCapacity - riskTolerance);
         let constrainingFactor: 'capacity' | 'tolerance' | 'both' = 'both';
         if (diff > 5) {
             constrainingFactor = riskCapacity < riskTolerance ? 'capacity' : 'tolerance';
         }
 
-        // Analyze behavioral insights
         const analyzeBias = (score: number): 'Low' | 'Moderate' | 'High' => {
-            if (score >= 70) return 'Low'; // Higher score = more rational = low bias
+            if (score >= 70) return 'Low';
             if (score >= 40) return 'Moderate';
-            return 'High'; // Low score = high bias
+            return 'High';
         };
 
-        // Mapping to new questions for insights
         const behavioralInsights = {
-            lossAversion: analyzeBias(getScore('q20')), // Loss vs Gain
-            regretSensitivity: analyzeBias(getScore('q9')), // Past mistake regret
-            anchoring: analyzeBias(getScore('q15')), // Anchoring 500->700
-            overconfidence: analyzeBias(getScore('q14')), // Skill vs Pros
-            herding: analyzeBias(getScore('q18')), // Hot sector
+            lossAversion: analyzeBias(getScore('q20')),
+            regretSensitivity: analyzeBias(getScore('q9')),
+            anchoring: analyzeBias(getScore('q15')),
+            overconfidence: analyzeBias(getScore('q14')),
+            herding: analyzeBias(getScore('q18')),
         };
 
-        let tier = 1; let tierName = ''; let tierDescription = '';
-        let allocation = { equity: '', debt: '', gold: '' };
+        const cat = getCategoryFromScore(riskNumber);
 
-        if (finalScore >= 90) {
-            tier = 6; tierName = 'Ultra-Aggressive'; tierDescription = 'Maximum wealth creation with concentrated positions';
-            allocation = { equity: '90-95%', debt: '0-5%', gold: '5-10%' };
-        } else if (finalScore >= 75) {
-            tier = 5; tierName = 'Aggressive Growth'; tierDescription = 'Strong focus on wealth creation with high equity exposure';
-            allocation = { equity: '80-90%', debt: '5-15%', gold: '5%' };
-        } else if (finalScore >= 60) {
-            tier = 4; tierName = 'Growth Focused'; tierDescription = 'Long-term wealth creation with managed volatility';
-            allocation = { equity: '65-80%', debt: '15-30%', gold: '5%' };
-        } else if (finalScore >= 45) {
-            tier = 3; tierName = 'Moderate Balanced'; tierDescription = 'Balance between growth and stability';
-            allocation = { equity: '45-60%', debt: '35-45%', gold: '5-10%' };
-        } else if (finalScore >= 30) {
-            tier = 2; tierName = 'Conservative Income'; tierDescription = 'Prioritizes steady income and stability';
-            allocation = { equity: '20-35%', debt: '60-70%', gold: '5-10%' };
-        } else {
-            tier = 1; tierName = 'Safety First'; tierDescription = 'Safety and capital protection above all';
-            allocation = { equity: '5-15%', debt: '75-85%', gold: '10%' };
-        }
-
-        // Default goal based on time horizon (Q4)
-        const timeHorizonScore = getScore('q4'); // 25 to 100
+        // Goal from time horizon
+        const timeHorizonScore = getScore('q4');
         let goalType = 'Retirement Planning';
         let goalTimeframe = '(10-20 years)';
-
-        if (timeHorizonScore >= 90) { // More than 10 years
-            goalType = 'Wealth Accumulation';
-            goalTimeframe = '(15+ years)';
-        } else if (timeHorizonScore >= 70) { // 5-10 years
-            goalType = 'Retirement Planning';
-            goalTimeframe = '(10-20 years)';
-        } else if (timeHorizonScore >= 50) { // 2-5 years
-            goalType = 'Education Planning';
-            goalTimeframe = '(5-15 years)';
+        if (timeHorizonScore >= 90) {
+            goalType = 'Wealth Accumulation'; goalTimeframe = '(15+ years)';
+        } else if (timeHorizonScore >= 70) {
+            goalType = 'Retirement Planning'; goalTimeframe = '(10-20 years)';
+        } else if (timeHorizonScore >= 50) {
+            goalType = 'Education Planning'; goalTimeframe = '(5-15 years)';
         } else {
-            goalType = 'Near-term Goal';
-            goalTimeframe = '(2-5 years)';
+            goalType = 'Near-term Goal'; goalTimeframe = '(2-5 years)';
         }
 
         return {
             riskCapacity,
             riskTolerance,
             behavioralBias: behavioralScore,
-            finalScore,
-            tier,
-            tierName,
-            tierDescription,
-            allocation,
+            age,
+            ageFactor,
+            rawScore: Math.round(rawScore * 100) / 100,
+            riskNumber,
+            category: cat.category,
+            categoryName: cat.name,
+            allocation: { equity: cat.equity, debt: cat.debt, gold: cat.gold },
             answers,
             constrainingFactor,
             behavioralInsights,
             goalType,
-            goalTimeframe
+            goalTimeframe,
         };
     };
 
@@ -400,9 +403,30 @@ export const RiskAssessmentPage = () => {
     const questionsInSection = questions.filter(q => q.section === currentSection);
     const currentQuestion = questionsInSection[currentQuestionIdx];
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const result = calculateResults();
         localStorage.setItem('riskAssessmentResult', JSON.stringify(result));
+
+        // Save to backend (best-effort)
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            try {
+                await axios.post(`${API}/save`, {
+                    userId,
+                    riskCapacity: result.riskCapacity,
+                    riskTolerance: result.riskTolerance,
+                    behavioralBias: result.behavioralBias,
+                    answers: result.answers,
+                    behavioralInsights: result.behavioralInsights,
+                    goalType: result.goalType,
+                    goalTimeframe: result.goalTimeframe,
+                    constrainingFactor: result.constrainingFactor,
+                });
+            } catch (err) {
+                console.error('Failed to save risk profile to backend:', err);
+            }
+        }
+
         window.location.href = '/dashboard/risk-profile';
     };
 
@@ -410,7 +434,6 @@ export const RiskAssessmentPage = () => {
         if (isTransitioning) return;
         setAnswers(prev => ({ ...prev, [questionId]: value }));
 
-        // Auto-advance logic: move to next question/section after a small delay for visual feedback
         setIsTransitioning(true);
         setTimeout(() => {
             if (currentQuestionIdx < questionsInSection.length - 1) {
@@ -420,7 +443,7 @@ export const RiskAssessmentPage = () => {
                 setCurrentQuestionIdx(0);
             }
             setIsTransitioning(false);
-        }, 400); // 400ms delay to allow the user to see their selection (checkmark)
+        }, 400);
     };
 
     const answeredCount = Object.keys(answers).length;
@@ -431,28 +454,21 @@ export const RiskAssessmentPage = () => {
         return { ...s, count: answeredInIdx, total: sectionQs.length };
     });
 
-
     return (
         <div className="max-w-6xl mx-auto px-1 lg:px-0">
-            {/* Header Area */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-3 px-3 lg:px-0">
                 <div>
-                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Welcome, Sri!</h1>
+                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Welcome!</h1>
                     <p className="text-[12px] md:text-[13px] text-slate-500 font-medium">Let's get started with your <span className="text-blue-600 font-bold">Risk Assessment</span> for your Personalized Investment strategy.</p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    {/* Progress bar and time removed */}
                 </div>
             </div>
 
-            {/* Content Area */}
             <div className="bg-white rounded-[1.5rem] p-4 lg:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 flex flex-col min-h-[500px] lg:min-h-[400px]">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-6">
                     <div>
                         <h2 className="text-lg md:text-xl font-extrabold text-slate-900 mb-1">Risk Assessment</h2>
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Question {answeredCount + 1} of 20</span>
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Question {answeredCount + 1} of {questions.length}</span>
                             <span className="w-1 h-1 rounded-full bg-slate-300" />
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">~ 5 mins</span>
                         </div>

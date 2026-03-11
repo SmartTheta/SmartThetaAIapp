@@ -27,9 +27,22 @@ export const KYCComponent: React.FC<KYCComponentProps> = ({ onComplete }) => {
         consent: false
     });
 
+    const [showOtp, setShowOtp] = useState(false);
+    const [otp, setOtp] = useState('');
+
+    const handleSendOtp = () => {
+        if (formData.mobile) {
+            setShowOtp(true);
+        }
+    };
+
     const handleSubmit = () => {
-        if (formData.consent) {
+        if (formData.consent && otp === '123456') {
             onComplete();
+        } else if (!otp) {
+            alert('Please enter the OTP sent to your Aadhaar linked mobile.');
+        } else {
+            alert('Invalid OTP. Please try 123456 for demo.');
         }
     };
 
@@ -98,6 +111,29 @@ export const KYCComponent: React.FC<KYCComponentProps> = ({ onComplete }) => {
                         </div>
                         <p className="text-[10px] sm:text-xs text-slate-500 mt-2">Format: ABCDE1234F (5 letters, 4 digits, 1 letter)</p>
                     </div>
+
+                    {!showOtp ? (
+                        <button
+                            onClick={handleSendOtp}
+                            disabled={!formData.mobile || formData.mobile.length < 10}
+                            className="w-full py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition-all disabled:opacity-50"
+                        >
+                            Get Aadhaar OTP
+                        </button>
+                    ) : (
+                        <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+                            <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-2">Aadhaar OTP</label>
+                            <input
+                                type="text"
+                                placeholder="Enter 6-digit OTP"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value)}
+                                className="w-full px-4 py-3.5 sm:py-4 bg-blue-50 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-center tracking-[0.5em] text-base sm:text-lg font-black"
+                                maxLength={6}
+                            />
+                            <p className="text-[10px] sm:text-xs text-blue-600 font-bold text-center">OTP sent to Aadhaar linked mobile ending in {formData.mobile.slice(-4)}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

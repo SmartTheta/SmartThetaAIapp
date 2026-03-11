@@ -5,6 +5,9 @@ import indexRoutes from './routes/index';
 import scannerRoutes from './routes/scanner';
 import stockRoutes from './routes/stocks';
 import brokerRoutes from './routes/broker';
+import riskProfileRoutes from './routes/riskProfile';
+import authRoutes from './routes/auth';
+import portfolioRoutes from './routes/portfolioRoutes';
 
 const app = express();
 
@@ -17,6 +20,9 @@ app.use('/api/index', indexRoutes);
 app.use('/api/scanner', scannerRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/broker', brokerRoutes);
+app.use('/api/risk-profile', riskProfileRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {

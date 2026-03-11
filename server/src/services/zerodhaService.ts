@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 import { wrapper } from 'axios-cookiejar-support';
 import { CookieJar } from 'tough-cookie';
 import BrokerAccount, { IBrokerAccount } from '../models/BrokerAccount';
+import { decrypt } from '../utils/crypto';
 
 // Use require for kiteconnect to avoid TS type conflicts
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -150,6 +151,41 @@ export async function zerodhaAutoLogin(credentials: ZerodhaCredentials): Promise
     }
 }
 
+// ─── OAuth Token Exchange ────────────────────────────────────────────────────
+
+/**
+ * Exchanges a Kite Connect request_token for an access_token via OAuth flow.
+ * Used when the user logs in on Zerodha's website and is redirected back.
+ */
+export async function exchangeRequestToken(
+    apiKey: string,
+    apiSecret: string,
+    requestToken: string
+): Promise<{ success: boolean; accessToken?: string; zerodhaUserId?: string; userName?: string; error?: string }> {
+    try {
+        const kite = new KiteConnect({ api_key: apiKey });
+        const sessionData = await kite.generateSession(requestToken, apiSecret);
+
+        const accessToken: string = sessionData.access_token;
+        const zerodhaUserId: string = sessionData.user_id || '';
+        const userName: string = sessionData.user_name || '';
+
+        if (!accessToken) {
+            return { success: false, error: 'access_token not received from Zerodha' };
+        }
+
+        return { success: true, accessToken, zerodhaUserId, userName };
+
+    } catch (error: any) {
+        const message =
+            error?.response?.data?.message ||
+            error?.message ||
+            'Unknown error during token exchange';
+        console.error('[ZerodhaService] Token exchange failed:', message);
+        return { success: false, error: `Token exchange failed: ${message}` };
+    }
+}
+
 // ─── Place Stock Order ────────────────────────────────────────────────────────
 
 /**
@@ -172,20 +208,36 @@ export async function placeStockOrder(
     txnType: 'BUY' | 'SELL'
 ): Promise<OrderResult> {
     try {
+        // Detect if we should use AMO (After Market Order)
+        // NSE Market: 9:15 AM - 3:30 PM
+        // AMO can typically be placed after 3:45 PM until 9:00 AM next day
+        const now = new Date();
+        const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+        const istDate = new Date(now.getTime() + IST_OFFSET);
+        const hours = istDate.getUTCHours();
+        const minutes = istDate.getUTCMinutes();
+        const currentTimeInMinutes = (hours * 60) + minutes;
+
+        const isMarketOpen = currentTimeInMinutes >= (9 * 60 + 15) && currentTimeInMinutes <= (15 * 60 + 30);
+        // AMO timing: after 3:45 PM (945 mins) or before 9:10 AM (550 mins)
+        const isAmoTime = currentTimeInMinutes > (15 * 60 + 45) || currentTimeInMinutes < (9 * 60 + 10);
+
+        const variety = (isAmoTime && !isMarketOpen) ? kite.VARIETY_AMO : kite.VARIETY_REGULAR;
+
         const orderParams = {
-            variety: kite.VARIETY_REGULAR,
+            variety: variety,
             tradingsymbol: symbol.toUpperCase(),
-            exchange: kite.EXCHANGE_NSE,           // NSE for stocks
+            exchange: kite.EXCHANGE_NSE,
             transaction_type: txnType === 'BUY'
                 ? kite.TRANSACTION_TYPE_BUY
                 : kite.TRANSACTION_TYPE_SELL,
             quantity: quantity,
-            product: kite.PRODUCT_CNC,            // CNC = delivery (stocks)
-            order_type: kite.ORDER_TYPE_MARKET,      // Market order
+            product: kite.PRODUCT_CNC,
+            order_type: kite.ORDER_TYPE_MARKET,
             validity: kite.VALIDITY_DAY
         };
 
-        const orderId: string = await kite.placeOrder(kite.VARIETY_REGULAR, orderParams);
+        const orderId: string = await kite.placeOrder(variety, orderParams);
 
         if (!orderId) {
             return { success: false, message: `Failed to place order for ${symbol}` };
@@ -222,7 +274,7 @@ export async function getKiteForUser(userId: string): Promise<{ kite: any; accou
     const account = await BrokerAccount.findOne({ userId: new Types.ObjectId(userId) });
     if (!account) return null;
 
-    const kite = new KiteConnect({ api_key: account.apiKey });
+    const kite = new KiteConnect({ api_key: decrypt(account.apiKey) });
 
     // Re-use existing token if logged in recently (Zerodha tokens last ~1 day)
     if (account.isLoggedIn && account.accessToken && account.lastLoginTime) {
@@ -233,13 +285,21 @@ export async function getKiteForUser(userId: string): Promise<{ kite: any; accou
         }
     }
 
-    // Token expired or missing — re-login automatically
+    // Token expired or missing — try auto re-login if we have the password
+    if (!account.password || !account.zerodhaUserId) {
+        // OAuth-only account: no password stored, can't auto re-login
+        console.warn('[ZerodhaService] Token expired for OAuth account (no password). User must re-authenticate.');
+        account.isLoggedIn = false;
+        await account.save();
+        return null;
+    }
+
     const result = await zerodhaAutoLogin({
-        apiKey: account.apiKey,
-        apiSecret: account.apiSecret,
+        apiKey: decrypt(account.apiKey),
+        apiSecret: decrypt(account.apiSecret),
         zerodhaUserId: account.zerodhaUserId,
-        password: account.password,
-        totpKey: account.totpKey
+        password: decrypt(account.password),
+        totpKey: decrypt(account.totpKey)
     });
 
     if (!result.success || !result.accessToken) {
